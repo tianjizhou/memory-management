@@ -1,5 +1,6 @@
 class process
 {
+	Jinghua Feng
 	PID
 	initial_StartingTime
 	total_CPUburst
