@@ -7,7 +7,7 @@ class process
 	each_CPUBurst
 	each_I/OBurst
   #of_I/OBurst
-	remaining_Time
+	int remaining_Time
 
 	vector coming_into_ReadyQueue
 	vector start_of_CPUburst
