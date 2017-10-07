@@ -1,2 +1,2 @@
-# operating-systems
+# operating-system
 process simulation
