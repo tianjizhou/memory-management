@@ -1,0 +1,9 @@
+
+file names are all lower case
+
+class names start with a Capital letter, with no connecting '_' or '-'.
+
+member variables name with a trailing underscore '_'.
+
+
+(add here...)
