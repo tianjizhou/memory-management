@@ -1,2 +1,5 @@
 
 	
+ready_queue should be a class rather than a queue/vector
+
+I/O burst / block state
