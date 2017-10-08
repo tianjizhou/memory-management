@@ -1,5 +1,5 @@
 
 	
-ready_queue should be a class rather than a queue/vector
+ready_queue -> list
 
 I/O burst / block state
