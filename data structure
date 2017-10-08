@@ -1,5 +1,5 @@
 
 	
-ready_queue -> list
+ready_queue -> list	(class)
 
-I/O burst / block state
+I/O burst -> vector	(class)
