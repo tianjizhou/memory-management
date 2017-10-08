@@ -1,5 +1,6 @@
 
-	
-ready_queue -> list	(class)
 
-I/O burst -> vector	(class)
+class ready_queue -> list
+
+class I/O burst -> vector
+	push a vector of processes to ready_queue
