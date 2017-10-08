@@ -28,6 +28,7 @@ class CPU {
 		// REPRESENTATION
 		int clock_time_;
 		Process * process_;
+		// int content_switching_time_;
 
 
 };
