@@ -11,9 +11,14 @@ int main(int argc, char* argv[]) {
 
 
 	// three processes arrive at time 0 and are put into ready queue immediately
+	/*
 	Process A('A',2);
-	Process B('B',3);
-	Process C('C',4);
+     	Process B('B',3);
+     	Process C('C',4);
+     	*/
+	Process A('A' , 1 , 2 , 1 , 1 );
+     	Process B('B' , 1 , 3 , 1 , 1 );
+     	Process C('C' , 1 , 4 , 1 , 1 );
 
 	std::queue<Process *> ready_queue;
 
