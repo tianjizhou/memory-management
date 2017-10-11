@@ -12,7 +12,7 @@
 class ReadyQueue {
 public:
 	// CONSTRUCTOR
-	ReadyQueue() { processes_ = NULL;}
+	//ReadyQueue(){}
 	
 	// ACCESSORS
 	Process* front() { return processes_.front(); }
