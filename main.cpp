@@ -14,56 +14,89 @@
 int main(int argc, char* argv[]) {
 
     // Load input and store all processes in pending queue
-	Process A('A' , 1 , 7 , 1 , 1 );
-    Process B('B' , 1 , 3 , 1 , 1 );
-    Process C('C' , 1 , 4 , 1 , 1 );
+	Process A('A' , 1 , 10 , 1 , 0 );
+    Process B('B' , 1 , 9 , 1 , 0 );
+    Process C('C' , 1 , 8 , 1 , 0 );
+	Process D('D' , 7 , 2 , 1 , 0 );
+	std::vector<Process*> tmp1, tmp2;
+	tmp1.push_back(&A);
+	tmp1.push_back(&B);
+	tmp1.push_back(&C);
+	tmp2.push_back(&D);
 	std::map<int, std::vector<Process*> > pending_queue;
-	std::vector<Process*> tmp;
-	tmp.push_back(&A);
-	tmp.push_back(&B);
-	tmp.push_back(&C);
-	pending_queue[1] = tmp;
+	pending_queue[1] = tmp1;
+	pending_queue[7] = tmp2;
 
 	ReadyQueue ready_queue;
 	CPU core;
 	Clock c;
-	std::string mode("RR");
+	std::string mode("SRT");
+	bool new_arrival = false;
 
 	// Not considering IO queue
-	while (!(ready_queue.empty() && core.idle() && pending_queue.empty())) {
+	while (!(ready_queue.empty() && core.idle() && pending_queue.empty())
+		|| core.cs_block()) {
+		// READY QUEUE UPDATE ------------------------------------
 		// New processes arrive
 		if (pending_queue.find(c.time()) != pending_queue.end()) {
 			ready_queue.push(pending_queue[c.time()]);
 			pending_queue.erase(c.time());
 			ready_queue.sort(mode);
+			new_arrival = true;
 		}
-		// Load process into CPU
-		if (core.idle() && !ready_queue.empty()) {
-			core.push(ready_queue.front());
-			ready_queue.pop();
-			core.half_cs(); // Load context
-			c.half_cs();
+		// Processes finish IO
+
+		// CPU UPDATE --------------------------------------------
+		core.tick();
+		// Not during context switch
+		if (!core.cs_block()) {
+			// Load process into CPU
+			if (core.idle() && !ready_queue.empty()) {
+				core.push(ready_queue.front());
+				ready_queue.pop();
+				core.half_cs();
+			}
+			// Remove totally completed process from CPU
+			else if (!core.idle() && core.complete()) {
+				core.pop(); // No need to add to anyplace else
+				core.half_cs();
+			}
+			// Remove completed process from CPU
+			else if (!core.idle() && core.single_complete() && !ready_queue.empty()) {
+				core.pop(); // should add process into IO queue
+				core.half_cs();
+			}
+			// Preempt process (RR)
+			else if (!core.idle() && mode == "RR" 
+				&& core.slice_over() && !ready_queue.empty()) {
+				core.pop(); // should add process into Ready queue
+				core.half_cs();
+			}
+			// Preempt process (SRT)
+			else if (new_arrival && !core.idle() && mode == "SRT" 
+				&& ready_queue.front()->tCPU() < core.current_process()->tCPU()) {
+				core.pop(); // should add process into Ready queue
+				core.half_cs();
+			}
+			else {
+				core.run();
+			}
+			new_arrival = false;		
 		}
-		// Remove process from CPU
-		else if (!core.idle() && core.process_complete()) {
-			core.pop(); // should add process into IO queue
-			core.half_cs(); // Remove context
-			c.half_cs();
-		}
-		else if (!core.idle() && mode == "RR" && core.slice_over()) {
-			core.pop(); // should add process into Ready queue
-			core.half_cs();
-			c.half_cs();
-		}
+
+		// IO QUEUE UPDATE -----------------------------------------
 		
-		if (!core.idle())
-			std::cout << "time: " << c.time() <<" process: " << core.current_processID() << std::endl;
+
+		// CLOCK UPDATE -----------------------------------------
+		// time increases by 1 ms
+		if (core.cs_block())
+			std::cout << "time: " << c.time() << " switch " << std::endl;
+		else if (!core.idle())
+			std::cout << "time: " << c.time() << " process: " << core.current_processID() << std::endl;
 		else
 			std::cout << "time: " << c.time() << std::endl;		
-		core.run();
+		
 		c.tick();
-
-
 	}
 	
 	return EXIT_SUCCESS;

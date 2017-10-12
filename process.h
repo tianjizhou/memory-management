@@ -26,7 +26,8 @@ class Process {
         int burst_num() const { return remaining_bursts_ ; }
 		int tIO() const { return IO_time_ ; }
 		int tCPU() const { return remaining_time_; }
-		bool complete() const { return (remaining_time_ == 0); }
+		bool single_complete() const { return (remaining_time_ == 0); }
+		bool complete() const { return (remaining_time_ == 0 && remaining_bursts_ == 0); }
 		// bool all_complete() {}
 
 		// MODIFIERS
@@ -44,7 +45,7 @@ class Process {
 		// UPDATING...
         int arrival_time_;      // arrival time
 	    int remaining_bursts_;  // number of CPU bursts	
-  		int remaining_time_;
+  		int remaining_time_;	// remaining time in single burst
   		//int total_CPU_time_;
 		// int total_bursts_;
 };
