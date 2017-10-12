@@ -9,7 +9,6 @@ class Process {
   	public:
 
 		// CONSTRUCTOR
-		//Process(char c, int t) : PID_(c), single_CPU_time_(t), remaining_time_(t) {}
         Process( char c , int t_arrival , int t_burst , int c_burst , int t_IO ) {
                  PID_ = c;
                  arrival_time_ = t_arrival; 
@@ -28,10 +27,13 @@ class Process {
 		int tCPU() const { return remaining_time_; }
 		bool single_complete() const { return (remaining_time_ == 0); }
 		bool complete() const { return (remaining_time_ == 0 && remaining_bursts_ == 0); }
+		bool IO_complete() const { return (remaining_IO_time_ == 0); }
 		// bool all_complete() {}
 
 		// MODIFIERS
 		void CPU_tick() { if (remaining_time_>0) remaining_time_--; }
+		void IO_tick() { if (remaining_IO_time_>0) remaining_IO_time_--; }
+		void IO_reset() { remaining_IO_time_=IO_time_; }
         void decrease_bursts() { if ( remaining_bursts_ > 0 ) remaining_bursts_--; }
 
 	private:
@@ -40,14 +42,17 @@ class Process {
 		// CONSTANT
 		char PID_;              // process id
 		int single_CPU_time_;   // CPU burst time
-		int IO_time_;           // IO wait time
+		int IO_time_;
+
 
 		// UPDATING...
         int arrival_time_;      // arrival time
 	    int remaining_bursts_;  // number of CPU bursts	
   		int remaining_time_;	// remaining time in single burst
+		int remaining_IO_time_; // remaining time of current I/O blocking
   		//int total_CPU_time_;
 		// int total_bursts_;
+
 };
 
 #endif

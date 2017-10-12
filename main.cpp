@@ -8,16 +8,18 @@
 #include "cpu.h"
 #include "ready_queue.h"
 #include "clock.h"
+#include "io.h"
 
 
 
 int main(int argc, char* argv[]) {
 
     // Load input and store all processes in pending queue
-	Process A('A' , 1 , 10 , 1 , 0 );
-    Process B('B' , 1 , 9 , 1 , 0 );
-    Process C('C' , 1 , 8 , 1 , 0 );
-	Process D('D' , 7 , 2 , 1 , 0 );
+	// PID, arriving time, each CPU burst, # of bursts, I/O time
+	Process A('A' , 1 , 10 , 1 , 5 );
+    Process B('B' , 1 , 9 , 1 , 20 );
+    Process C('C' , 1 , 8 , 1 , 5 );
+	Process D('D' , 7 , 2 , 1 , 5 );
 	std::vector<Process*> tmp1, tmp2;
 	tmp1.push_back(&A);
 	tmp1.push_back(&B);
@@ -30,6 +32,7 @@ int main(int argc, char* argv[]) {
 	ReadyQueue ready_queue;
 	CPU core;
 	Clock c;
+	IO IOblocker;
 	std::string mode("SRT");
 	bool new_arrival = false;
 
@@ -57,11 +60,13 @@ int main(int argc, char* argv[]) {
 			}
 			// Remove totally completed process from CPU
 			else if (!core.idle() && core.complete()) {
-				core.pop(); // No need to add to anyplace else
+				IOblocker.push(core.current_process());
+				core.pop();
 			}
 			// Remove completed process from CPU
 			else if (!core.idle() && core.single_complete() && !ready_queue.empty()) {
-				core.pop(); // should add process into IO queue
+				IOblocker.push(core.current_process());
+				core.pop();
 			}
 			// Preempt process (RR)
 			else if (!core.idle() && mode == "RR" 
@@ -80,17 +85,17 @@ int main(int argc, char* argv[]) {
 		}
 
 		// IO QUEUE UPDATE -----------------------------------------
-		
+		IOblocker.tick();		
 
 		// CLOCK UPDATE -----------------------------------------
 		// time increases by 1 ms
 		if (core.cs_block())
-			std::cout << "time: " << c.time() << " switch " << std::endl;
+			std::cout << "time: " << c.time() << " CPU: " <<" switching";
 		else if (!core.idle())
-			std::cout << "time: " << c.time() << " process: " << core.current_processID() << std::endl;
+			std::cout << "time: " << c.time() << " CPU: "<<" process: " << core.current_processID();
 		else
-			std::cout << "time: " << c.time() << std::endl;		
-		
+			std::cout << "time: " << c.time() << " CPU:  idle ";		
+		std::cout <<" IO: "<<IOblocker.PIDs()<<std::endl;
 		c.tick();
 	}
 	
