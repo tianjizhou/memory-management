@@ -17,10 +17,11 @@ class IO {
 
 		// ACCESSOR
 		std::string PIDs();
+		bool isEmpty(){return processes_.empty();}
 
 		// MODIFIER
 		void push(Process *p);
-		void pop();
+		std::vector<Process *> pop();
 		void tick();
 
 
