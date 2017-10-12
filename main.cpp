@@ -127,17 +127,19 @@ int main(int argc, char* argv[]) {
 		std::cout <<" IO: "<<IOblocker.PIDs()<<std::endl;
 		c.tick();
 	}
+	return EXIT_SUCCESS ;
+}
 	
-	// Added functions for pending_qeueu by Feng
-	int CountCharacter(std::string str)
+// Added functions for pending_qeueu by Feng
+int CountCharacter(std::string str)
 {
-    int count = 0 ;
-    unsigned int i ;
-    for( i = 0 ; i < str.size() ; i++ ) {
-        if ( !isspace( str[ i ] ) )
-            count++ ;
-    }
-    return count ;
+	int count = 0 ;
+	unsigned int i ;
+	for( i = 0 ; i < str.size() ; i++ ) {
+		if ( !isspace( str[ i ] ) )
+		    count++ ;
+	}
+	return count ;
 }
 
 
