@@ -54,29 +54,24 @@ int main(int argc, char* argv[]) {
 			if (core.idle() && !ready_queue.empty()) {
 				core.push(ready_queue.front());
 				ready_queue.pop();
-				core.half_cs();
 			}
 			// Remove totally completed process from CPU
 			else if (!core.idle() && core.complete()) {
 				core.pop(); // No need to add to anyplace else
-				core.half_cs();
 			}
 			// Remove completed process from CPU
 			else if (!core.idle() && core.single_complete() && !ready_queue.empty()) {
 				core.pop(); // should add process into IO queue
-				core.half_cs();
 			}
 			// Preempt process (RR)
 			else if (!core.idle() && mode == "RR" 
 				&& core.slice_over() && !ready_queue.empty()) {
 				core.pop(); // should add process into Ready queue
-				core.half_cs();
 			}
 			// Preempt process (SRT)
 			else if (new_arrival && !core.idle() && mode == "SRT" 
 				&& ready_queue.front()->tCPU() < core.current_process()->tCPU()) {
 				core.pop(); // should add process into Ready queue
-				core.half_cs();
 			}
 			else {
 				core.run();
