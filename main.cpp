@@ -45,18 +45,20 @@ int main(int argc, char* argv[]) {
 
     // Load input and store all processes in pending queue
 	// PID, arriving time, each CPU burst, # of bursts, I/O time
+	/*
 	Process A('A' , 1 , 10 , 1 , 5 );
     	Process B('B' , 1 , 9 , 1 , 20 );
     	Process C('C' , 1 , 8 , 1 , 5 );
 	Process D('D' , 7 , 2 , 1 , 5 );
+	
 	std::vector<Process*> tmp1, tmp2;
 	tmp1.push_back(&A);
 	tmp1.push_back(&B);
 	tmp1.push_back(&C);
 	tmp2.push_back(&D);
+	*/
 	std::map<int, std::vector<Process*> > pending_queue;
-	pending_queue[1] = tmp1;
-	pending_queue[7] = tmp2;
+	pending_queue = initial_queue ;
 
 	ReadyQueue ready_queue;
 	CPU core;
