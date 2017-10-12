@@ -3,7 +3,7 @@
 
 // Add new processes into ready queue without sorting
 void ReadyQueue::push(std::vector<Process*> new_processes) {
-	for (int i = 0; i < new_processes.size(); i++) {
+	for (unsigned int i = 0; i < new_processes.size(); i++) {
 		processes_.push_back(new_processes[i]);
 	}
 }
