@@ -25,9 +25,9 @@ void IO::pop() {
 	for (std::list<Process*>::iterator it=processes_.begin();it!=processes_.end();it++) {
 		if ((*it)->IO_complete()) {
 			if ((*it)->complete())
-				ready_list.push_back((*it));
-			else
 				pop_list.push_back((*it));
+			else
+				ready_list.push_back((*it));
 		}
 	}
 
