@@ -7,6 +7,7 @@
 #include <vector>
 #include <list>
 #include <iostream>
+#include <algorithm>
 
 
 class ReadyQueue {
@@ -27,9 +28,10 @@ public:
 private:
 	// REPRESENTATION
 	std::list<Process*> processes_;
+};
+
 	bool FCFS(Process* p1, Process* p2);
 	bool SRT(Process* p1, Process* p2);
 	bool RR(Process* p1, Process* p2);
-};
 
 #endif

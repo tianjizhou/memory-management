@@ -4,34 +4,37 @@
 
 #include "process.h"
 
-// For now it is assumed that there is not content switching time.
 class CPU {
 
 	public:
 
 		// CONSTRUCTOR
-		CPU() { process_ = NULL; t_slice_ = 70; num_cs_ = 0;}
+		CPU() { process_ = NULL; t_slice_ = 70; num_cs_ = 0; remaining_t_slice_ = t_slice_; }
 
 		// ACCESSORS
-		//int time() const { return clock_time_; }
 		bool idle() const { return process_ == NULL; }
 		char current_processID() const { return process_->ID(); }
+		Process* current_process() const {return process_; }
 		bool process_complete() const { return process_->complete(); }
+		bool slice_over() const {return remaining_t_slice_ == 0; }
 
 		// MODIFIER
-		//void tick() { clock_time_++; }
 		void pop() { process_ = NULL; }
-		void push(Process* p) { process_ = p; }
-		void run() { if (process_ != NULL) process_->CPU_tick(); }
+		void push(Process* p) { process_ = p; remaining_t_slice_ = t_slice_; }
+		void run() { if (process_ != NULL) process_->CPU_tick(); remaining_t_slice_--; }
 		void half_cs() { num_cs_ += 0.5; }
 
 	private:
 
 		// REPRESENTATION
-		//int clock_time_;
+		// CONSTANT
+		int t_slice_; // time slice for RR algorithm
+
+		// UPDATING...
 		Process* process_;
 		double num_cs_;
-		int t_slice_; // time slice for RR algorithm
+		int remaining_t_slice_;
+		
 
 
 };
