@@ -5,6 +5,7 @@
 #include "process.h"
 #include <list>
 #include <string>
+#include <vector>
 
 
 // It is assumed that no content switching time required for writing into IO or ready queue. 
