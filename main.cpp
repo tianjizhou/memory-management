@@ -251,7 +251,3 @@ void PrintProcessMap( const ProcessMap & initial_queue )
         PrintProcessVector( itr -> second ) ;
     }
 }
-	//Added end by Feng
-	
-	return EXIT_SUCCESS;
-}
