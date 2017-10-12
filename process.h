@@ -13,8 +13,8 @@ class Process {
                  PID_ = c;
                  arrival_time_ = t_arrival; 
                  single_CPU_time_ = t_burst;
-                 remaining_time_ = t_burst;
-                 remaining_bursts_ = c_burst; 
+                 total_CPU_time_ = t_burst;
+                 total_bursts_ = c_burst; 
                  IO_time_ = t_IO;
         }
 
@@ -43,15 +43,15 @@ class Process {
 		char PID_;              // process id
 		int single_CPU_time_;   // CPU burst time
 		int IO_time_;
+       		int arrival_time_;      // arrival time
+  		int total_CPU_time_;
+		int total_bursts_;
 
 
 		// UPDATING...
-        int arrival_time_;      // arrival time
-	    int remaining_bursts_;  // number of CPU bursts	
+	    	int remaining_bursts_;  // number of CPU bursts	
   		int remaining_time_;	// remaining time in single burst
 		int remaining_IO_time_; // remaining time of current I/O blocking
-  		//int total_CPU_time_;
-		// int total_bursts_;
 
 };
 
