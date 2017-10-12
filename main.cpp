@@ -43,10 +43,6 @@ int main(int argc, char* argv[]) {
 	    PrintProcessVector( process_vec ) ;
 	    PrintProcessMap( initial_queue ) ;
 
-	Process A('A' , 1 , 2 , 1 , 1 );
-	Process B('B' , 1 , 3 , 1 , 1 );
-	Process C('C' , 1 , 4 , 1 , 1 );
-
     // Load input and store all processes in pending queue
 	// PID, arriving time, each CPU burst, # of bursts, I/O time
 	Process A('A' , 1 , 10 , 1 , 5 );
