@@ -18,7 +18,7 @@ void IO::push(Process *p) {
 	processes_.push_back(p);
 };
 
-void IO::pop() {
+std::vector<Process *> IO::pop() {
 	std::vector<Process*> pop_list;
 	std::vector<Process*> ready_list;
 
@@ -39,7 +39,7 @@ void IO::pop() {
 		processes_.remove((*it3));
 	}
 
-	//add ready_list to ready queue
+	return ready_list;
 };
 
 void IO::tick() {
