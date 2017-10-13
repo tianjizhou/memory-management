@@ -13,8 +13,9 @@ class Process {
                  PID_ = c;
                  initial_arrival_time_ = t_arrival; 
                  single_CPU_time_ = t_burst;
-		 total_bursts_ = c_burst; 
+		 		 total_bursts_ = c_burst; 
                  IO_time_ = t_IO;
+                 reset();
         }
 
 		// ACCESSORS
@@ -30,22 +31,25 @@ class Process {
 		// bool all_complete() {}
 
 		// MODIFIERS
-		void reset() {remaining_bursts_=total_bursts_;remaining_time_=single_CPU_time_;remaining_IO_time_=IO_time_;arrival_time_=initial_arrival_time_;}
+		void reset() { remaining_bursts_ = total_bursts_;
+			remaining_time_ = single_CPU_time_;
+			remaining_IO_time_ = IO_time_;
+			arrival_time_ = initial_arrival_time_; }
+
 		void CPU_tick() { if (remaining_time_>0) remaining_time_--; }
 		void IO_tick() { if (remaining_IO_time_>0) remaining_IO_time_--; }
-		void IO_reset() { remaining_IO_time_=IO_time_; }
+		void IO_reset() { remaining_IO_time_ = IO_time_; }
         	void decrease_bursts() { if ( remaining_bursts_ > 0 ) remaining_bursts_--; }
 
 	private:
 
 		// REPRESENTATION
 		// CONSTANT
-		char PID_;              // process id
-		int single_CPU_time_;   // CPU burst time
-		int IO_time_;		// IO time
-       		int initial_arrival_time_;      // arrival time
+		char PID_; // process id
+		int initial_arrival_time_; // arrival time
+		int single_CPU_time_; // CPU burst time
 		int total_bursts_;
-
+		int IO_time_; // IO time
 
 		// UPDATING...
 	    	int remaining_bursts_;  // number of CPU bursts	
