@@ -18,7 +18,7 @@ class IO {
 
 		// ACCESSOR
 		std::string PIDs();
-		bool isEmpty(){return processes_.empty();}
+		bool empty() const { return processes_.empty(); }
 
 		// MODIFIER
 		void push(Process *p);

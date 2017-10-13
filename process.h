@@ -20,7 +20,7 @@ class Process {
 
 		// ACCESSORS
 		char ID() const { return PID_; }
-        	int arrival() const { return arrival_time_ ; }
+        	int arrival_time() const { return arrival_time_ ; }
         	int burst_time() const { return single_CPU_time_ ;}
         	int burst_num() const { return remaining_bursts_ ; }
 		int tIO() const { return IO_time_ ; }
@@ -39,7 +39,8 @@ class Process {
 		void CPU_tick() { if (remaining_time_>0) remaining_time_--; }
 		void IO_tick() { if (remaining_IO_time_>0) remaining_IO_time_--; }
 		void IO_reset() { remaining_IO_time_ = IO_time_; }
-        	void decrease_bursts() { if ( remaining_bursts_ > 0 ) remaining_bursts_--; }
+        void decrease_bursts() { if ( remaining_bursts_ > 0 ) remaining_bursts_--; }
+        void arrive(int t) { arrival_time_ = t; }
 
 	private:
 

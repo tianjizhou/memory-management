@@ -28,7 +28,7 @@ void PrintProcessMap( const ProcessMap & initial_queue ) ;
 int main(int argc, char* argv[]) {
 	
 	//
-	if( argv[ 1 ] == NULL ){
+	/*if( argv[ 1 ] == NULL ){
         	std::cerr << "ERROR: Invalid arguments\nUSAGE: ./a.out <input-file>\n" ;
 		return EXIT_FAILURE ;
 	    } 
@@ -41,11 +41,11 @@ int main(int argc, char* argv[]) {
 	    ConvertProcessVecToMap( process_vec , initial_queue ) ;
 
 	    PrintProcessVector( process_vec ) ;
-	    PrintProcessMap( initial_queue ) ;
+	    PrintProcessMap( initial_queue ) ;*/
 
     // Load input and store all processes in pending queue
 	// PID, arriving time, each CPU burst, # of bursts, I/O time
-	/*
+	
 	Process A('A' , 1 , 10 , 1 , 5 );
     	Process B('B' , 1 , 9 , 1 , 20 );
     	Process C('C' , 1 , 8 , 1 , 5 );
@@ -56,16 +56,17 @@ int main(int argc, char* argv[]) {
 	tmp1.push_back(&B);
 	tmp1.push_back(&C);
 	tmp2.push_back(&D);
-	*/
+	
 	std::map<int, std::vector<Process*> > pending_queue;
-	pending_queue = initial_queue ;
+	pending_queue[1] = tmp1;
+	pending_queue[7] = tmp2;
+	//pending_queue = initial_queue ;
 
 	ReadyQueue ready_queue;
 	CPU core;
 	Clock c;
 	IO IOblocker;
-	std::string mode("SRT");
-	bool new_arrival = false;
+	std::string mode("RR");
 
 	// Not considering IO queue
 	while (!(ready_queue.empty() && core.idle() && pending_queue.empty())
@@ -73,10 +74,8 @@ int main(int argc, char* argv[]) {
 		// READY QUEUE UPDATE ------------------------------------
 		// New processes arrive
 		if (pending_queue.find(c.time()) != pending_queue.end()) {
-			ready_queue.push(pending_queue[c.time()]);
+			ready_queue.push(pending_queue[c.time()], mode, c.time());
 			pending_queue.erase(c.time());
-			ready_queue.sort(mode);
-			new_arrival = true;
 		}
 		// Processes finish IO
 
@@ -84,36 +83,34 @@ int main(int argc, char* argv[]) {
 		core.tick();
 		// Not during context switch
 		if (!core.cs_block()) {
-			// Load process into CPU
-			if (core.idle() && !ready_queue.empty()) {
-				core.push(ready_queue.front());
-				ready_queue.pop();
-			}
 			// Remove totally completed process from CPU
-			else if (!core.idle() && core.complete()) {
-				IOblocker.push(core.current_process());
-				core.pop();
+			if (!core.idle() && core.complete()) {
+				IOblocker.push(core.pop());
 			}
 			// Remove completed process from CPU
 			else if (!core.idle() && core.single_complete() && !ready_queue.empty()) {
-				IOblocker.push(core.current_process());
-				core.pop();
+				IOblocker.push(core.pop());
 			}
 			// Preempt process (RR)
-			else if (!core.idle() && mode == "RR" 
-				&& core.slice_over() && !ready_queue.empty()) {
-				core.pop(); // should add process into Ready queue
+			else if (!core.idle() && mode == "RR" && !ready_queue.empty()
+				&& core.slice_over()) {
+				ready_queue.push(core.pop(), mode, c.time());
 			}
 			// Preempt process (SRT)
-			else if (new_arrival && !core.idle() && mode == "SRT" 
+			else if (!core.idle() && mode == "SRT" && !ready_queue.empty()
 				&& ready_queue.front()->tCPU() < core.current_process()->tCPU()) {
-				core.pop(); // should add process into Ready queue
+				ready_queue.push(core.pop(), mode, c.time());
+			}
+
+			// Load process into CPU
+			if (core.idle() && !ready_queue.empty()) {
+				core.push(ready_queue.pop());
 			}
 			else {
 				core.run();
-			}
-			new_arrival = false;		
+			}		
 		}
+
 
 		// IO QUEUE UPDATE -----------------------------------------
 		IOblocker.tick();		
@@ -121,17 +118,17 @@ int main(int argc, char* argv[]) {
 		// CLOCK UPDATE -----------------------------------------
 		// time increases by 1 ms
 		if (core.cs_block())
-			std::cout << "time: " << c.time() << " CPU: " <<" switching";
+			std::cout << "time: " << c.time() << " || CPU: " <<" process: " << core.current_processID() <<" switching";
 		else if (!core.idle())
-			std::cout << "time: " << c.time() << " CPU: "<<" process: " << core.current_processID();
+			std::cout << "time: " << c.time() << " || CPU: " <<" process: " << core.current_processID();
 		else
-			std::cout << "time: " << c.time() << " CPU:  idle ";		
-		std::cout <<" IO: "<<IOblocker.PIDs()<<std::endl;
+			std::cout << "time: " << c.time() << " || CPU:  idle ";		
+		std::cout <<" || IO: "<<IOblocker.PIDs()<<std::endl;
 		c.tick();
 	}
 	return EXIT_SUCCESS ;
 }
-	
+/*	
 // Added functions for pending_qeueu by Feng
 int CountCharacter(std::string str)
 {
@@ -255,3 +252,4 @@ void PrintProcessMap( const ProcessMap & initial_queue )
         PrintProcessVector( itr -> second ) ;
     }
 }
+*/
