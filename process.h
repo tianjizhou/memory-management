@@ -21,6 +21,7 @@ class Process {
 		// ACCESSORS
 		char ID() const { return PID_; }
         	int arrival_time() const { return arrival_time_ ; }
+        	int initial_arrival_time() const { return initial_arrival_time_ ; }
         	int burst_time() const { return single_CPU_time_ ;}
         	int burst_num() const { return remaining_bursts_ ; }
 		int tIO() const { return IO_time_ ; }
