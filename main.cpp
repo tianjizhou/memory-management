@@ -28,7 +28,7 @@ void PrintProcessMap( const ProcessMap & initial_queue ) ;
 int main(int argc, char* argv[]) {
 	
 	//
-	/*if( argv[ 1 ] == NULL ){
+	if( argv[ 1 ] == NULL ){
         	std::cerr << "ERROR: Invalid arguments\nUSAGE: ./a.out <input-file>\n" ;
 		return EXIT_FAILURE ;
 	    } 
@@ -41,11 +41,11 @@ int main(int argc, char* argv[]) {
 	    ConvertProcessVecToMap( process_vec , initial_queue ) ;
 
 	    PrintProcessVector( process_vec ) ;
-	    PrintProcessMap( initial_queue ) ;*/
+	    PrintProcessMap( initial_queue ) ;
 
     // Load input and store all processes in pending queue
 	// PID, arriving time, each CPU burst, # of bursts, I/O time
-	
+	/*
 	Process A('A' , 1 , 10 , 1 , 5 );
     	Process B('B' , 1 , 9 , 1 , 20 );
     	Process C('C' , 1 , 8 , 1 , 5 );
@@ -56,11 +56,12 @@ int main(int argc, char* argv[]) {
 	tmp1.push_back(&B);
 	tmp1.push_back(&C);
 	tmp2.push_back(&D);
+   */
 	
 	std::map<int, std::vector<Process*> > pending_queue;
-	pending_queue[1] = tmp1;
-	pending_queue[7] = tmp2;
-	//pending_queue = initial_queue ;
+	//pending_queue[1] = tmp1;
+	//pending_queue[7] = tmp2;
+	pending_queue = initial_queue ;
 
 	ReadyQueue ready_queue;
 	CPU core;
@@ -128,7 +129,7 @@ int main(int argc, char* argv[]) {
 	}
 	return EXIT_SUCCESS ;
 }
-/*	
+
 // Added functions for pending_qeueu by Feng
 int CountCharacter(std::string str)
 {
@@ -205,7 +206,7 @@ void ConvertProcessVecToMap( const ProcessVector & process_vec , ProcessMap & in
         ProcessMap :: iterator itr ;
 
         // check whether there is process vector with the same arrival time
-        int curr_arrival =  process_vec[ i ] -> arrival() ;
+        int curr_arrival =  process_vec[ i ] -> initial_arrival_time() ;
         itr = initial_queue.find( curr_arrival );
         if (itr != initial_queue.end())
             itr->second.push_back( process_vec[ i ] ) ;
@@ -214,7 +215,7 @@ void ConvertProcessVecToMap( const ProcessVector & process_vec , ProcessMap & in
         else {
             ProcessVector proc_vec_tmp ;
             proc_vec_tmp.push_back( process_vec[ i ] ) ;
-            initial_queue.insert( std::make_pair( process_vec[ i ] -> arrival() , proc_vec_tmp ) );
+            initial_queue.insert( std::make_pair( process_vec[ i ] -> initial_arrival_time() , proc_vec_tmp ) );
         }
 
     }
@@ -235,7 +236,7 @@ void PrintProcessVector( const ProcessVector & process_vec )
         ProcessVector::const_iterator iter ;
         for(iter = process_vec.begin(); iter != process_vec.end(); iter++) {
             std::cout << std::setw( 7 ) <<  ( *iter )-> ID() 
-                      << std::setw( 15 ) << ( *iter ) -> arrival() 
+                      << std::setw( 15 ) << ( *iter ) -> initial_arrival_time() 
                       << std::setw( 15 ) << ( *iter ) -> burst_time()
                       << std::setw( 15 ) << ( *iter ) -> burst_num() 
                       << std::setw( 15 ) << ( *iter ) -> tIO() 
@@ -252,4 +253,4 @@ void PrintProcessMap( const ProcessMap & initial_queue )
         PrintProcessVector( itr -> second ) ;
     }
 }
-*/
+
