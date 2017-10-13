@@ -42,25 +42,8 @@ int main(int argc, char* argv[]) {
 
 	    PrintProcessVector( process_vec ) ;
 	    PrintProcessMap( initial_queue ) ;
-
-    // Load input and store all processes in pending queue
-	// PID, arriving time, each CPU burst, # of bursts, I/O time
-	/*
-	Process A('A' , 1 , 10 , 1 , 5 );
-    	Process B('B' , 1 , 9 , 1 , 20 );
-    	Process C('C' , 1 , 8 , 1 , 5 );
-	Process D('D' , 7 , 2 , 1 , 5 );
-	
-	std::vector<Process*> tmp1, tmp2;
-	tmp1.push_back(&A);
-	tmp1.push_back(&B);
-	tmp1.push_back(&C);
-	tmp2.push_back(&D);
-   */
 	
 	std::map<int, std::vector<Process*> > pending_queue;
-	//pending_queue[1] = tmp1;
-	//pending_queue[7] = tmp2;
 	pending_queue = initial_queue ;
 
 	ReadyQueue ready_queue;
@@ -69,38 +52,52 @@ int main(int argc, char* argv[]) {
 	IO IOblocker;
 	std::string mode("RR");
 
-	// Not considering IO queue
-	while (!(ready_queue.empty() && core.idle() && pending_queue.empty())
+	while (!(ready_queue.empty() && core.idle() && pending_queue.empty() && IOblocker.empty())
 		|| core.cs_block()) {
+
+// =========== TIME: starting moment of the Xth second =========================
+
 		// READY QUEUE UPDATE ------------------------------------
 		// New processes arrive
 		if (pending_queue.find(c.time()) != pending_queue.end()) {
 			ready_queue.push(pending_queue[c.time()], mode, c.time());
 			pending_queue.erase(c.time());
 		}
-		// Processes finish IO
+
+// =========== TIME: Xs to (X+1)s ===============================================
 
 		// CPU UPDATE --------------------------------------------
 		core.tick();
-		// Not during context switch
-		if (!core.cs_block()) {
-			// Remove totally completed process from CPU
-			if (!core.idle() && core.complete()) {
-				IOblocker.push(core.pop());
-			}
-			// Remove completed process from CPU
-			else if (!core.idle() && core.single_complete() && !ready_queue.empty()) {
+		// IO QUEUE UPDATE -----------------------------------------
+		IOblocker.tick();
+		
+// =========== TIME: ending moment of the Xth second, i.e. start of (X+1)s ======
+
+		// ========================================================
+		// All tick()s are completed, now switch(if needed).
+		//
+		// CPU->I/O
+		// ready_queue->CPU
+		// I/O->ready_queue
+		//
+		// ========================================================
+
+		ready_queue.push(IOblocker.pop(), mode, c.time()+1);
+
+		if (!core.cs_block()) {// Not during context switch
+			// Remove completed process from CPU		NOTE: Let I/O decide if it's a full completion. 
+			if (!core.idle() && core.single_complete()) {	// QUESTION: Why do we need to check the ready_queue? (was && !ready_queue.empty())
 				IOblocker.push(core.pop());
 			}
 			// Preempt process (RR)
 			else if (!core.idle() && mode == "RR" && !ready_queue.empty()
 				&& core.slice_over()) {
-				ready_queue.push(core.pop(), mode, c.time());
+				ready_queue.push(core.pop(), mode, c.time()+1);	// NOTE: As the tick()s are done, we are now at the next second.
 			}
 			// Preempt process (SRT)
 			else if (!core.idle() && mode == "SRT" && !ready_queue.empty()
 				&& ready_queue.front()->tCPU() < core.current_process()->tCPU()) {
-				ready_queue.push(core.pop(), mode, c.time());
+				ready_queue.push(core.pop(), mode, c.time()+1);
 			}
 
 			// Load process into CPU
@@ -112,25 +109,31 @@ int main(int argc, char* argv[]) {
 			}		
 		}
 
+		
 
-		// IO QUEUE UPDATE -----------------------------------------
-		IOblocker.tick();		
+		if (core.cs_block())
+			std::cout << "time: " << c.time() << " || CPU: " <<" process " << core.current_processID() <<" switching";
+		else if (!core.idle())
+			std::cout << "time: " << c.time() << " || CPU: " <<" process " << core.current_processID() <<" running  ";
+		else
+			std::cout << "time: " << c.time() << " || CPU:  idle......         ";		
+		std::cout <<" || IO: "<<IOblocker.PIDs()<<std::endl;
+		
+	
 
 		// CLOCK UPDATE -----------------------------------------
 		// time increases by 1 ms
-		if (core.cs_block())
-			std::cout << "time: " << c.time() << " || CPU: " <<" process: " << core.current_processID() <<" switching";
-		else if (!core.idle())
-			std::cout << "time: " << c.time() << " || CPU: " <<" process: " << core.current_processID();
-		else
-			std::cout << "time: " << c.time() << " || CPU:  idle ";		
-		std::cout <<" || IO: "<<IOblocker.PIDs()<<std::endl;
 		c.tick();
+
+// =========== TIME: ending moment of the Xth second, i.e. start of (X+1)s ======
 	}
 	return EXIT_SUCCESS ;
 }
 
+
+//=====================================================
 // Added functions for pending_qeueu by Feng
+//=====================================================
 int CountCharacter(std::string str)
 {
 	int count = 0 ;

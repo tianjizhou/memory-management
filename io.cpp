@@ -15,7 +15,8 @@ std::string IO::PIDs() {
 void IO::push(Process *p) {
 	if (p != NULL) {
 		p->IO_reset();
-		processes_.push_back(p);		
+		if (!(p->IO_complete()))	// in the case IO time==0, do not push. Note: need to record finishing time!!!
+			processes_.push_back(p);		
 	}
 };
 
@@ -49,5 +50,4 @@ void IO::tick() {
 	for (std::list<Process*>::iterator it=processes_.begin();it!=processes_.end();it++) {
 		(*it)->IO_tick();
 	}
-	pop();
 }
