@@ -42,98 +42,95 @@ int main(int argc, char* argv[]) {
 
 	    PrintProcessVector( process_vec ) ;
 	    PrintProcessMap( initial_queue ) ;
-	
+
+    // Load input and store all processes in pending queue
+	// PID, arriving time, each CPU burst, # of bursts, I/O time
+	Process A('A' , 1 , 10 , 1 , 5 );
+    	Process B('B' , 1 , 9 , 1 , 20 );
+    	Process C('C' , 1 , 8 , 1 , 5 );
+	Process D('D' , 7 , 2 , 1 , 5 );
+	std::vector<Process*> tmp1, tmp2;
+	tmp1.push_back(&A);
+	tmp1.push_back(&B);
+	tmp1.push_back(&C);
+	tmp2.push_back(&D);
 	std::map<int, std::vector<Process*> > pending_queue;
-	pending_queue = initial_queue ;
+	pending_queue[1] = tmp1;
+	pending_queue[7] = tmp2;
 
 	ReadyQueue ready_queue;
 	CPU core;
 	Clock c;
 	IO IOblocker;
-	std::string mode("RR");
+	std::string mode("SRT");
+	bool new_arrival = false;
 
-	while (!(ready_queue.empty() && core.idle() && pending_queue.empty() && IOblocker.empty())
+	// Not considering IO queue
+	while (!(ready_queue.empty() && core.idle() && pending_queue.empty())
 		|| core.cs_block()) {
-
-// =========== TIME: starting moment of the Xth second =========================
-
 		// READY QUEUE UPDATE ------------------------------------
 		// New processes arrive
 		if (pending_queue.find(c.time()) != pending_queue.end()) {
-			ready_queue.push(pending_queue[c.time()], mode, c.time());
+			ready_queue.push(pending_queue[c.time()]);
 			pending_queue.erase(c.time());
+			ready_queue.sort(mode);
+			new_arrival = true;
 		}
-
-// =========== TIME: Xs to (X+1)s ===============================================
+		// Processes finish IO
 
 		// CPU UPDATE --------------------------------------------
 		core.tick();
-		// IO QUEUE UPDATE -----------------------------------------
-		IOblocker.tick();
-		
-// =========== TIME: ending moment of the Xth second, i.e. start of (X+1)s ======
-
-		// ========================================================
-		// All tick()s are completed, now switch(if needed).
-		//
-		// CPU->I/O
-		// ready_queue->CPU
-		// I/O->ready_queue
-		//
-		// ========================================================
-
-		ready_queue.push(IOblocker.pop(), mode, c.time()+1);
-
-		if (!core.cs_block()) {// Not during context switch
-			// Remove completed process from CPU		NOTE: Let I/O decide if it's a full completion. 
-			if (!core.idle() && core.single_complete()) {	// QUESTION: Why do we need to check the ready_queue? (was && !ready_queue.empty())
-				IOblocker.push(core.pop());
-			}
-			// Preempt process (RR)
-			else if (!core.idle() && mode == "RR" && !ready_queue.empty()
-				&& core.slice_over()) {
-				ready_queue.push(core.pop(), mode, c.time()+1);	// NOTE: As the tick()s are done, we are now at the next second.
-			}
-			// Preempt process (SRT)
-			else if (!core.idle() && mode == "SRT" && !ready_queue.empty()
-				&& ready_queue.front()->tCPU() < core.current_process()->tCPU()) {
-				ready_queue.push(core.pop(), mode, c.time()+1);
-			}
-
+		// Not during context switch
+		if (!core.cs_block()) {
 			// Load process into CPU
 			if (core.idle() && !ready_queue.empty()) {
-				core.push(ready_queue.pop());
+				core.push(ready_queue.front());
+				ready_queue.pop();
+			}
+			// Remove totally completed process from CPU
+			else if (!core.idle() && core.complete()) {
+				IOblocker.push(core.current_process());
+				core.pop();
+			}
+			// Remove completed process from CPU
+			else if (!core.idle() && core.single_complete() && !ready_queue.empty()) {
+				IOblocker.push(core.current_process());
+				core.pop();
+			}
+			// Preempt process (RR)
+			else if (!core.idle() && mode == "RR" 
+				&& core.slice_over() && !ready_queue.empty()) {
+				core.pop(); // should add process into Ready queue
+			}
+			// Preempt process (SRT)
+			else if (new_arrival && !core.idle() && mode == "SRT" 
+				&& ready_queue.front()->tCPU() < core.current_process()->tCPU()) {
+				core.pop(); // should add process into Ready queue
 			}
 			else {
 				core.run();
-			}		
+			}
+			new_arrival = false;		
 		}
 
-		
-
-		if (core.cs_block())
-			std::cout << "time: " << c.time() << " || CPU: " <<" process " << core.current_processID() <<" switching";
-		else if (!core.idle())
-			std::cout << "time: " << c.time() << " || CPU: " <<" process " << core.current_processID() <<" running  ";
-		else
-			std::cout << "time: " << c.time() << " || CPU:  idle......         ";		
-		std::cout <<" || IO: "<<IOblocker.PIDs()<<std::endl;
-		
-	
+		// IO QUEUE UPDATE -----------------------------------------
+		IOblocker.tick();		
 
 		// CLOCK UPDATE -----------------------------------------
 		// time increases by 1 ms
+		if (core.cs_block())
+			std::cout << "time: " << c.time() << " CPU: " <<" switching";
+		else if (!core.idle())
+			std::cout << "time: " << c.time() << " CPU: "<<" process: " << core.current_processID();
+		else
+			std::cout << "time: " << c.time() << " CPU:  idle ";		
+		std::cout <<" IO: "<<IOblocker.PIDs()<<std::endl;
 		c.tick();
-
-// =========== TIME: ending moment of the Xth second, i.e. start of (X+1)s ======
 	}
 	return EXIT_SUCCESS ;
 }
-
-
-//=====================================================
+	
 // Added functions for pending_qeueu by Feng
-//=====================================================
 int CountCharacter(std::string str)
 {
 	int count = 0 ;
@@ -209,7 +206,7 @@ void ConvertProcessVecToMap( const ProcessVector & process_vec , ProcessMap & in
         ProcessMap :: iterator itr ;
 
         // check whether there is process vector with the same arrival time
-        int curr_arrival =  process_vec[ i ] -> initial_arrival_time() ;
+        int curr_arrival =  process_vec[ i ] -> arrival() ;
         itr = initial_queue.find( curr_arrival );
         if (itr != initial_queue.end())
             itr->second.push_back( process_vec[ i ] ) ;
@@ -218,7 +215,7 @@ void ConvertProcessVecToMap( const ProcessVector & process_vec , ProcessMap & in
         else {
             ProcessVector proc_vec_tmp ;
             proc_vec_tmp.push_back( process_vec[ i ] ) ;
-            initial_queue.insert( std::make_pair( process_vec[ i ] -> initial_arrival_time() , proc_vec_tmp ) );
+            initial_queue.insert( std::make_pair( process_vec[ i ] -> arrival() , proc_vec_tmp ) );
         }
 
     }
@@ -239,7 +236,7 @@ void PrintProcessVector( const ProcessVector & process_vec )
         ProcessVector::const_iterator iter ;
         for(iter = process_vec.begin(); iter != process_vec.end(); iter++) {
             std::cout << std::setw( 7 ) <<  ( *iter )-> ID() 
-                      << std::setw( 15 ) << ( *iter ) -> initial_arrival_time() 
+                      << std::setw( 15 ) << ( *iter ) -> arrival() 
                       << std::setw( 15 ) << ( *iter ) -> burst_time()
                       << std::setw( 15 ) << ( *iter ) -> burst_num() 
                       << std::setw( 15 ) << ( *iter ) -> tIO() 
@@ -256,4 +253,3 @@ void PrintProcessMap( const ProcessMap & initial_queue )
         PrintProcessVector( itr -> second ) ;
     }
 }
-

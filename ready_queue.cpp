@@ -2,26 +2,10 @@
 #include "ready_queue.h"
 
 // Add new processes into ready queue without sorting
-void ReadyQueue::push(std::vector<Process*> new_processes, const std::string& mode, int t) {
+void ReadyQueue::push(std::vector<Process*> new_processes) {
 	for (unsigned int i = 0; i < new_processes.size(); i++) {
-		new_processes[i]->arrive(t);
 		processes_.push_back(new_processes[i]);
 	}
-	sort(mode);
-}
-
-void ReadyQueue::push(Process* p, const std::string& mode, int t) {
-	if (p != NULL) {
-		p->arrive(t);
-		processes_.push_back(p);
-		sort(mode);
-	}	
-}
-
-Process* ReadyQueue::pop() {
-	Process* tmp = processes_.front();
-	processes_.pop_front();
-	return tmp;
 }
 
 // Sort the processes in the ready queue based on different algorithms
@@ -38,8 +22,8 @@ void ReadyQueue::sort(const std::string& mode) {
 
 // Sort algorithms
 bool FCFS(Process* p1, Process* p2) {
-	return p1->arrival_time() < p2->arrival_time()
-		|| (p1->arrival_time() == p2->arrival_time() && p1->ID() < p2->ID());
+	return p1->arrival() < p2->arrival()
+		|| (p1->arrival() == p2->arrival() && p1->ID() < p2->ID());
 }
 
 bool SRT(Process* p1, Process* p2) {
@@ -48,6 +32,6 @@ bool SRT(Process* p1, Process* p2) {
 }
 
 bool RR(Process* p1, Process* p2) {
-	return p1->arrival_time() < p2->arrival_time()
-		|| (p1->arrival_time() == p2->arrival_time() && p1->ID() < p2->ID());
+	return p1->arrival() < p2->arrival()
+		|| (p1->arrival() == p2->arrival() && p1->ID() < p2->ID());
 }

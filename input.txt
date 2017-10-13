@@ -1,7 +1,4 @@
 # example simulator input file
 #
 # <proc-id>|<initial-arrival-time>|<cpu-burst-time>|<num-bursts>|<io-time>
-A|0|6|2|2
-B|0|8|1|0
-C|7|9|2|4
-D|12|17|2|3
+A|0|168|5|287

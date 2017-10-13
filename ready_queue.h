@@ -13,7 +13,7 @@
 class ReadyQueue {
 public:
 	// CONSTRUCTOR
-	ReadyQueue(){ wait_time_ = 0; }
+	//ReadyQueue(){}
 	
 	// ACCESSORS
 	Process* front() { return processes_.front(); }
@@ -21,15 +21,13 @@ public:
 	int size() const { return processes_.size(); }
 	
 	// MODIFIERS
-	void push(std::vector<Process*> new_processes, const std::string& mode, int t);
-	void push(Process* process, const std::string& mode, int t);
-	Process* pop();
+	void push(std::vector<Process*> new_processes);
+	void pop() { processes_.pop_front(); }
 	void sort(const std::string& mode);
 
 private:
 	// REPRESENTATION
 	std::list<Process*> processes_;
-	int wait_time_;
 };
 
 	bool FCFS(Process* p1, Process* p2);
