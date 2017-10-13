@@ -1,6 +1,6 @@
 // FILE: io.cpp
 #include "io.h"
-#include <vector>
+#include <iostream>
 IO::IO() {
 	
 };
@@ -14,37 +14,40 @@ std::string IO::PIDs() {
 };
 
 void IO::push(Process *p) {
-	p->IO_reset();
-	processes_.push_back(p);
+	if (p != NULL) {
+		if (!(p->IO_complete()))	// in the case IO time==0, do not push. Note: need to record finishing time!!!
+			processes_.push_back(p);		
+	}
 };
 
 std::vector<Process *> IO::pop() {
-	std::vector<Process*> pop_list;
-	std::vector<Process*> ready_list;
+	std::vector<Process*> pop_list;		// store fully completed processes and pop them
+	std::vector<Process*> ready_list;	// store not yet completed processes and return them (to ready_queue)
+	std::list<Process*>::iterator it;
+	std::vector<Process*>::iterator it2;
 
-	for (std::list<Process*>::iterator it=processes_.begin();it!=processes_.end();it++) {
+	for (it = processes_.begin(); it != processes_.end(); it++) {
 		if ((*it)->IO_complete()) {
 			if ((*it)->complete())
-				pop_list.push_back((*it));
+				pop_list.push_back(*it);
 			else
-				ready_list.push_back((*it));
+				ready_list.push_back(*it);
 		}
 	}
 
-	for (std::vector<Process*>::iterator it2=ready_list.begin();it2!=ready_list.end();it2++) {
-		processes_.remove((*it2));
+	for (it2 = ready_list.begin(); it2 != ready_list.end(); it2++) {
+		processes_.remove(*it2);
+		(*it2)->IO_reset();
 	}
 
-	for (std::vector<Process*>::iterator it3=pop_list.begin();it3!=pop_list.end();it3++) {
-		processes_.remove((*it3));
+	for (it2 = pop_list.begin();it2 != pop_list.end(); it2++) {
+		processes_.remove(*it2);
 	}
-
 	return ready_list;
 };
 
-void IO::tick() {
+void IO::run() {
 	for (std::list<Process*>::iterator it=processes_.begin();it!=processes_.end();it++) {
 		(*it)->IO_tick();
 	}
-	pop();
 }
