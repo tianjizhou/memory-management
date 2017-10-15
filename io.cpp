@@ -24,24 +24,23 @@ std::vector<Process *> IO::pop() {
 	std::vector<Process*> pop_list;		// store fully completed processes and pop them
 	std::vector<Process*> ready_list;	// store not yet completed processes and return them (to ready_queue)
 	std::list<Process*>::iterator it;
-	std::vector<Process*>::iterator it2;
+	std::vector<Process*>::iterator it_pop;
+	std::vector<Process*>::iterator it_ready;
 
 	for (it = processes_.begin(); it != processes_.end(); it++) {
-		if ((*it)->IO_complete()) {
-			if ((*it)->complete())
+		if ((*it)->complete())
 				pop_list.push_back(*it);
-			else
+		else if ((*it)->IO_complete())
 				ready_list.push_back(*it);
-		}
 	}
 
-	for (it2 = ready_list.begin(); it2 != ready_list.end(); it2++) {
-		processes_.remove(*it2);
-		(*it2)->IO_reset();
+	for (it_ready = ready_list.begin(); it_ready != ready_list.end(); it_ready++) {	// return them to the ready_queue
+		processes_.remove(*it_ready);
+		(*it_ready)->IO_reset();
 	}
 
-	for (it2 = pop_list.begin();it2 != pop_list.end(); it2++) {
-		processes_.remove(*it2);
+	for (it_pop = pop_list.begin();it_pop != pop_list.end(); it_pop++) {			// pop completed processes
+		processes_.remove(*it_pop);
 	}
 	return ready_list;
 };

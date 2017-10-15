@@ -29,7 +29,7 @@ class CPU {
 		void unload();
 		Process* pop( Clock clk , ReadyQueue ready_queue );
 		void push(Process* p);
-		void run();
+		void run( Clock clk , ReadyQueue ready_queue );
 		void half_cs();
 		void tick();
 

@@ -1,3 +1,16 @@
+10/15/2017 5PM
+
+checked and revised output, which now matches correctly with the output of p1-input01.txt, except:
+
+1) RR: completely wrong
+2) SRT: need to print out preemtion when new arrived process causes one. 
+
+to do:
+statistics
+
+
+
+
 10/14/2017 11PM
 Code changes:
 1. ready_queue.h and ready_queue.cpp: added function--void PrintPIDs();

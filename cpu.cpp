@@ -29,27 +29,29 @@ Process* CPU::pop( Clock clk , ReadyQueue ready_queue ) {
 		return tmp;
 	}
 	else {
-        int remaining_bursts = process_-> burst_num() ;
-        if ( remaining_bursts > 0 ) {
-            clk.PrintTime() ;
-            std::cout << "Process " << process_ -> ID() <<" completed a CPU burst; " 
-                      << remaining_bursts ; 
-            if ( remaining_bursts == 1 )
-                std::cout << " burst to go " ;
-            else
-                std::cout << " bursts to go " ;
-            ready_queue.PrintPIDs() ;
+		if ( process_-> single_complete() ) {
+        	int remaining_bursts = process_-> burst_num() ;
+        	if ( remaining_bursts > 0 ) {
+            	clk.PrintTime() ;
+            	std::cout << "Process " << process_ -> ID() <<" completed a CPU burst; " 
+            	          << remaining_bursts ; 
+            	if ( remaining_bursts == 1 )
+            	    std::cout << " burst to go " ;
+            	else
+            	    std::cout << " bursts to go " ;
+            	ready_queue.PrintPIDs() ;
 
-            clk.PrintTime() ;
-            std::cout << "Process " << process_ -> ID() << " switching out of CPU; will block on I/O until time "
-                << clk.time() + get_half_cs() + process_ -> tIO() << "ms " ;
-            ready_queue.PrintPIDs() ;
-        }
-        else {
-            clk.PrintTime() ;
-            std::cout << "Process " << process_ -> ID() <<" terminated " ;
-            ready_queue.PrintPIDs() ;
-        }
+	            clk.PrintTime() ;
+	            std::cout << "Process " << process_ -> ID() << " switching out of CPU; will block on I/O until time "
+	                << clk.time() + get_half_cs() + process_ -> tIO() << "ms " ;
+	            ready_queue.PrintPIDs() ;
+	        }
+	        else {
+	            clk.PrintTime() ;
+	            std::cout << "Process " << process_ -> ID() <<" terminated " ;
+	            ready_queue.PrintPIDs() ;
+	        }
+		}
 
         half_cs();
         return NULL;
@@ -62,12 +64,17 @@ void CPU::push(Process* p) {
 	half_cs();
 }
 
-void CPU::run() {
+void CPU::run(Clock clk , ReadyQueue ready_queue) {
+	if (cs_unblock_ == true) {
+		cs_unblock_ = false;
+		std::cout << "time " << clk.time() << "ms: Process " << current_processID() << " started using the CPU ";
+		if (process_->preempted())
+			std::cout << "with " << process_->remaining_time() << "ms remaining ";
+        ready_queue.PrintPIDs() ;
+	}
 	if (process_ != NULL && !cs_block_)
 		process_->CPU_tick();
 	remaining_t_slice_--;
-	if (cs_unblock_ == true)
-		cs_unblock_ = false;
 }
 
 void CPU::half_cs() {

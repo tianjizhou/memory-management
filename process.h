@@ -24,9 +24,11 @@ class Process {
         int initial_arrival_time() const { return initial_arrival_time_ ; }
         int burst_time() const { return single_CPU_time_ ;}
         int burst_num() const { return remaining_bursts_ ; }
+		int remaining_time() const { return remaining_time_; }
         int tIO() const { return IO_time_ ; }
 		int tCPU() const { return remaining_time_; }
 		bool single_complete() const { return (remaining_time_ == 0); }
+		bool preempted() const { return (remaining_time_ != single_CPU_time_);}
 		bool complete() const { return (remaining_time_ == 0 && remaining_bursts_ == 0); }
 		bool IO_complete() const { return (remaining_IO_time_ == 0); }
 

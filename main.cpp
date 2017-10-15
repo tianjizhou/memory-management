@@ -17,6 +17,9 @@
 #include "io.h"
 #include "input.h"
 
+int algorithm(std::map<int, std::vector<Process*> > initial_queue, std::string mode);
+void queue_reset(std::map<int, std::vector<Process*> > pending_queue);
+
 int main(int argc, char* argv[]) {
 	
 	//
@@ -35,17 +38,25 @@ int main(int argc, char* argv[]) {
 
     //input.PrintProcessVector( process_vec ) ;
     //input.PrintProcessMap( initial_queue ) ;
+	
+	algorithm(initial_queue, "FCFS");
+	std::cout<<std::endl;
+	algorithm(initial_queue, "SRT");
+	std::cout<<std::endl;
+	//algorithm(initial_queue, "RR");
 
-	std::map<int, std::vector<Process*> > pending_queue;
-	pending_queue = initial_queue ;
+	return EXIT_SUCCESS;
+}
+
+int algorithm(std::map<int, std::vector<Process*> > initial_queue, std::string mode) {
+
+	std::map<int, std::vector<Process*> > pending_queue(initial_queue) ;
+	queue_reset(pending_queue);
 
 	ReadyQueue ready_queue;
 	CPU core;
 	Clock c;
 	IO IOblocker;
-	//std::string mode("FCFS");
-	//std::string mode("RR");
-	std::string mode("SRT");
 
     // Print start of simulation
     c.PrintTime() ;
@@ -58,29 +69,43 @@ int main(int argc, char* argv[]) {
 // =========== TIME: starting moment of the Nth second, N = 0, 1, 2, ... =========
 
 		// READY QUEUE UPDATE ------------------------------------
-		// New processes arrive
+
+		// New processes arrive ----------------------------------	
+		// NOTE: What if it preempts current process? Should not add to queue and should print out differently.
+		// -------------------------------------------------------
 		if ( pending_queue.find( c.time() ) != pending_queue.end()) {
             // print out new arrvial of processes when pushed in ready_queue
 			ready_queue.push( pending_queue[ c.time() ] , mode, c.time(), c, "arrival");
 			pending_queue.erase(c.time());
 		}
+
+		// Preemption --------------------------------------------	
+		// NOTE: Not considering preemtion DURING content switching !!
+		// -------------------------------------------------------
+		if (!core.cs_block()) {// Not during context switch
+			// Preempt process (SRT)
+			if (!core.idle() && mode == "SRT" && !ready_queue.empty()
+				&& ready_queue.front()->tCPU() < core.current_process()->tCPU()) {
+				ready_queue.push(core.pop( c , ready_queue ), mode, c.time());
+			}
+	
+		}
+
 		// Load process into CPU ---------------------------------
         Process * proc_tmp ;
 		if (core.idle() && !ready_queue.empty()) {
             proc_tmp = ready_queue.pop() ;
             // Print starting of CPU use 
 			core.push( proc_tmp );
-            std::cout << "time " << c.time() + core.get_half_cs() << "ms: Process "
-                      << core.current_processID() << " started using the CPU ";
-
-            ready_queue.PrintPIDs() ;
-		}	
+		}
+		
+	
 
 // =========== TIME: Ns to (N+1)s ===============================================
 
 		// CPU UPDATE --------------------------------------------
 		if (!core.idle() && !core.cs_block()) {	// Not during context switch
-			core.run();							// NOTE: If you prefer, we can integrate the conditions into the CPU.run() function.
+			core.run(c, ready_queue);							// NOTE: If you prefer, we can integrate the conditions into the CPU.run() function.
 		}
 
 		// IO QUEUE UPDATE ---------------------------------------
@@ -96,7 +121,7 @@ int main(int argc, char* argv[]) {
 		else
 			std::cout << "time: " << c.time() << " || CPU:  idle......         ";		
 		std::cout <<" || IO: "<<IOblocker.PIDs()<<std::endl;
-        */
+		*/
 
 
 // =========== TIME: ending moment of the Nth second, i.e. start of (N+1)s ======
@@ -105,7 +130,7 @@ int main(int argc, char* argv[]) {
 		// CPU and I/O runs are completed, now switch(if needed).
 		//
 		// CPU->I/O			(Completion)
-		// CPU->ready_queue (Preemption)
+		// CPU->Ready_queue (Preemption)
 		//
 		// I/O->ready_queue
 		//
@@ -121,8 +146,7 @@ int main(int argc, char* argv[]) {
 
 
 		if (!core.cs_block()) {// Not during context switch
-			// Remove completed process from CPU		NOTE: Let I/O decide if it's a full completion. 
-            // QUESTION: Why do we need to check the ready_queue? (was && !ready_queue.empty())
+			// Remove completed process from CPU
 			if (!core.idle() && core.single_complete()) {	
 				IOblocker.push(core.pop( c , ready_queue )); // print finish using CPU
 			}
@@ -131,11 +155,7 @@ int main(int argc, char* argv[]) {
 				&& core.slice_over()) {
 				ready_queue.push(core.pop( c , ready_queue ), mode, c.time());
 			}
-			// Preempt process (SRT)
-			else if (!core.idle() && mode == "SRT" && !ready_queue.empty()
-				&& ready_queue.front()->tCPU() < core.current_process()->tCPU()) {
-				ready_queue.push(core.pop( c , ready_queue ), mode, c.time());
-			}
+			// SRT moved to the start of this second, immediately after the arrival of new processes
 	
 		}
 
@@ -147,4 +167,13 @@ int main(int argc, char* argv[]) {
     c.PrintTime() ;
     std::cout << "Simulator ended for " << mode << std::endl;
 	return EXIT_SUCCESS ;
+}
+
+void queue_reset(std::map<int, std::vector<Process*> > pending_queue){
+	ProcessMap::iterator itr ;
+    ProcessVector::iterator iter ;
+    for ( itr = pending_queue.begin(); itr != pending_queue.end(); itr++ )
+        for(iter = (itr->second).begin(); iter != (itr->second).end(); iter++)
+				(*iter)->reset();
+
 }
