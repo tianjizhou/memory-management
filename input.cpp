@@ -73,7 +73,8 @@ int Input::ReadProcesses( const char * file_name , ProcessVector & process_vec )
                     process_info.push_back( token ) ;
                     str.erase( 0, delim_pos + delimiter.length() );
                 }
-                str = str.substr( 0, str.length() - 1 ) ; // remove '\n'
+                //str = str.substr( 0, str.length() - 1 ) ; // remove '\n'
+                str = str.substr( 0, str.length() ) ; // remove '\n'
                 process_info.push_back( str ) ; // last parameter, t_io
 
 

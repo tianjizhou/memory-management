@@ -8,6 +8,8 @@ public:
 	int time() const { return time_; }
 	void tick() { time_++; }
 
+    void PrintTime() { std::cout << "time " << time_ << "ms: " ; }
+
 private:
 	int time_;
 };

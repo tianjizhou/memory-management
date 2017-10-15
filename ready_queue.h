@@ -2,13 +2,14 @@
 #ifndef _readyqueue_h
 #define _readyqueue_h
 
-#include "process.h"
 #include <string>
 #include <vector>
 #include <list>
 #include <iostream>
 #include <algorithm>
 
+#include "process.h"
+#include "clock.h"
 
 class ReadyQueue {
 public:
@@ -21,10 +22,13 @@ public:
 	int size() const { return processes_.size(); }
 	
 	// MODIFIERS
-	void push(std::vector<Process*> new_processes, const std::string& mode, int t);
+	void push(std::vector<Process*> new_processes, const std::string& mode, int t, Clock clk, const std::string & situation);
+   // void PrintPushProcesses( std::vector<Process*> proc_vec, Clock clk , const std::string & situation ) ;
 	void push(Process* process, const std::string& mode, int t);
 	Process* pop();
 	void sort(const std::string& mode);
+
+    void PrintPIDs() ;
 
 private:
 	// REPRESENTATION

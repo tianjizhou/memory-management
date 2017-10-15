@@ -2,11 +2,14 @@
 #ifndef _io_h
 #define _io_h
 
-#include "process.h"
 #include <list>
 #include <string>
 #include <vector>
+#include <iostream>
 
+#include "process.h"
+#include "clock.h"
+#include "ready_queue.h"
 
 // It is assumed that no content switching time required for writing into IO or ready queue. 
 class IO {

@@ -2,8 +2,11 @@
 #ifndef _cpu_h
 #define _cpu_h
 
-#include "process.h"
+#include <iostream>
 #include <stddef.h>
+#include "process.h"
+#include "ready_queue.h"
+#include "clock.h"
 
 class CPU {
 
@@ -20,10 +23,11 @@ class CPU {
 		bool complete() const { return process_->complete(); }
 		bool slice_over() const { return remaining_t_slice_ <= 0; }
 		bool cs_block() const { return cs_block_; }
+        int get_half_cs() const { return t_cs_ / 2 ; }
 
 		// MODIFIER
 		void unload();
-		Process* pop();
+		Process* pop( Clock clk , ReadyQueue ready_queue );
 		void push(Process* p);
 		void run();
 		void half_cs();

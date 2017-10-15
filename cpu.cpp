@@ -12,7 +12,7 @@ CPU::CPU() {
 	remaining_t_cs_ = 0;
 }
 
-Process* CPU::pop() {
+Process* CPU::pop( Clock clk , ReadyQueue ready_queue ) {
 	
 	if (cs_unblock_) {
 
@@ -29,8 +29,30 @@ Process* CPU::pop() {
 		return tmp;
 	}
 	else {
-		half_cs();
-		return NULL;
+        int remaining_bursts = process_-> burst_num() ;
+        if ( remaining_bursts > 0 ) {
+            clk.PrintTime() ;
+            std::cout << "Process " << process_ -> ID() <<" completed a CPU burst; " 
+                      << remaining_bursts ; 
+            if ( remaining_bursts == 1 )
+                std::cout << " burst to go " ;
+            else
+                std::cout << " bursts to go " ;
+            ready_queue.PrintPIDs() ;
+
+            clk.PrintTime() ;
+            std::cout << "Process " << process_ -> ID() << " switching out of CPU; will block on I/O until time "
+                << clk.time() + get_half_cs() + process_ -> tIO() << "ms " ;
+            ready_queue.PrintPIDs() ;
+        }
+        else {
+            clk.PrintTime() ;
+            std::cout << "Process " << process_ -> ID() <<" terminated " ;
+            ready_queue.PrintPIDs() ;
+        }
+
+        half_cs();
+        return NULL;
 	}	
 }
 
