@@ -24,14 +24,17 @@ class CPU {
 		bool slice_over() const { return remaining_t_slice_ <= 0; }
 		bool cs_block() const { return cs_block_; }
         int get_half_cs() const { return t_cs_ / 2 ; }
+        double num_cs() const { return num_cs_; }
+        int num_preempts() const { return num_preempts_; }
 
 		// MODIFIER
 		void unload();
-		Process* pop( Clock clk , ReadyQueue ready_queue );
+		Process* pop( Clock clk , ReadyQueue ready_queue , const std::string& mode);
 		void push(Process* p);
 		void run( Clock clk , ReadyQueue ready_queue );
 		void half_cs();
 		void tick();
+		void reset_slice(Clock clk);
 
 	private:
 
@@ -42,11 +45,14 @@ class CPU {
 
 		// UPDATING...
 		Process* process_;
-		double num_cs_;
 		int remaining_t_slice_;
 		int remaining_t_cs_;
 		bool cs_block_;
 		bool cs_unblock_;
+
+		// STAT
+		double num_cs_;	
+		int num_preempts_;	
 };
 
 #endif

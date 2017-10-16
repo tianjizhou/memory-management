@@ -1,3 +1,4 @@
+// FILE: input.cpp
 #include "input.h"
 
 int Input::CountCharacter( std::string str )
@@ -44,10 +45,11 @@ bool Input::ValidProcess( const std::vector< std:: string > process_info )
 }
 
 
-int Input::ReadProcesses( const char * file_name , ProcessVector & process_vec )
+bool Input::ReadProcesses( const char * file_name , ProcessVector & process_vec, int& num_processes, int& burst_t)
 {
     std::ifstream ifs( file_name ) ;
-    int proc_count = 0 ;
+    num_processes = 0 ;
+    burst_t = 0;
 
     if (ifs.is_open()) {
         std::string str;
@@ -97,8 +99,9 @@ int Input::ReadProcesses( const char * file_name , ProcessVector & process_vec )
                        std::atoi( process_info[ 4 ].c_str() ) 
                       )
                     ) ;
+                burst_t += std::atoi(process_info[2].c_str())*std::atoi(process_info[3].c_str());
             }
-            proc_count++ ;
+            num_processes++ ;
         }
     }
 
@@ -106,8 +109,7 @@ int Input::ReadProcesses( const char * file_name , ProcessVector & process_vec )
         std::cout << "Cannot open file " << file_name << "\n" ;
         return EXIT_FAILURE ;
     }
-
-    return proc_count ;
+    return EXIT_SUCCESS;
 }
 
 
