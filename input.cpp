@@ -45,10 +45,10 @@ bool Input::ValidProcess( const std::vector< std:: string > process_info )
 }
 
 
-bool Input::ReadProcesses( const char * file_name , ProcessVector & process_vec, int& num_processes, int& burst_t)
+bool Input::ReadProcesses( const char * file_name , ProcessVector & process_vec, int& num_bursts, int& burst_t)
 {
     std::ifstream ifs( file_name ) ;
-    num_processes = 0 ;
+    num_bursts = 0 ;
     burst_t = 0;
 
     if (ifs.is_open()) {
@@ -100,8 +100,8 @@ bool Input::ReadProcesses( const char * file_name , ProcessVector & process_vec,
                       )
                     ) ;
                 burst_t += std::atoi(process_info[2].c_str())*std::atoi(process_info[3].c_str());
+                num_bursts += std::atoi( process_info[ 3 ].c_str() );
             }
-            num_processes++ ;
         }
     }
 

@@ -17,9 +17,9 @@
 #include "input.h"
 
 int algorithm(std::map<int, std::vector<Process*> > initial_queue,
-			  const std::string& mode, std::ofstream& out_str, int num_processes, int burst_t);
+			  const std::string& mode, std::ofstream& out_str, int num_bursts, int burst_t);
 void queue_reset(std::map<int, std::vector<Process*> > pending_queue);
-void print_stat(std::ofstream& out_str, const std::string& mode, int num_processes,
+void print_stat(std::ofstream& out_str, const std::string& mode, int num_bursts,
 			    int burst_t, int wait_time, int half_t_cs, double num_cs, int num_preempts);
 
 int main(int argc, char* argv[]) {
@@ -37,26 +37,26 @@ int main(int argc, char* argv[]) {
     Input input ;
     ProcessVector process_vec ;
     ProcessMap initial_queue ;
-    int num_processes;
+    int num_bursts;
     int burst_t;
 
-    input.ReadProcesses( file_name , process_vec, num_processes, burst_t ) ;
+    input.ReadProcesses( file_name , process_vec, num_bursts, burst_t ) ;
     input.ConvertProcessVecToMap( process_vec , initial_queue ) ;
 
     //input.PrintProcessVector( process_vec ) ;
     //input.PrintProcessMap( initial_queue ) ;
 	
-	algorithm(initial_queue, "FCFS", out_str, num_processes, burst_t);
+	algorithm(initial_queue, "FCFS", out_str, num_bursts, burst_t);
 	std::cout<<std::endl;
-	algorithm(initial_queue, "SRT", out_str, num_processes, burst_t);
+	algorithm(initial_queue, "SRT", out_str, num_bursts, burst_t);
 	std::cout<<std::endl;
-	algorithm(initial_queue, "RR", out_str, num_processes, burst_t);
+	algorithm(initial_queue, "RR", out_str, num_bursts, burst_t);
 
 	return EXIT_SUCCESS;
 }
 
 int algorithm(std::map<int, std::vector<Process*> > initial_queue,
-			  const std::string& mode, std::ofstream& out_str, int num_processes, int burst_t) {
+			  const std::string& mode, std::ofstream& out_str, int num_bursts, int burst_t) {
 
 	std::map<int, std::vector<Process*> > pending_queue(initial_queue) ;
 	queue_reset(pending_queue);
@@ -181,7 +181,7 @@ int algorithm(std::map<int, std::vector<Process*> > initial_queue,
 	}
     c.PrintTime() ;
     std::cout << "Simulator ended for " << mode << std::endl;
-    print_stat(out_str, mode, num_processes, burst_t,
+    print_stat(out_str, mode, num_bursts, burst_t,
     		   ready_queue.wait_time(), core.get_half_cs(), core.num_cs(), core.num_preempts());
 	return EXIT_SUCCESS ;
 }
@@ -195,13 +195,13 @@ void queue_reset(std::map<int, std::vector<Process*> > pending_queue){
 
 }
 
-void print_stat(std::ofstream& out_str, const std::string& mode, int num_processes,
+void print_stat(std::ofstream& out_str, const std::string& mode, int num_bursts,
 			    int burst_t, int wait_time, int half_t_cs, double num_cs, int num_preempts) {
 	out_str << std::setprecision(2) << std::fixed;
 	out_str << "Algorithm " << mode << std::endl;
-	out_str << "-- average CPU burst time: " << (double)burst_t/num_processes << " ms" << std::endl;
-	out_str << "-- average wait time: " << (double)wait_time/num_processes << " ms" << std::endl;
-	out_str << "-- average turnaround time: " << (double)(wait_time+burst_t+half_t_cs*2*num_cs)/num_processes << " ms" << std::endl;
+	out_str << "-- average CPU burst time: " << (double)burst_t/num_bursts << " ms" << std::endl;
+	out_str << "-- average wait time: " << (double)wait_time/num_bursts << " ms" << std::endl;
+	out_str << "-- average turnaround time: " << (double)(wait_time+burst_t+half_t_cs*2*num_cs)/num_bursts << " ms" << std::endl;
 	out_str << std::setprecision(0) << std::fixed;
 	out_str << "-- total number of context switches: " << num_cs << std::endl;
 	out_str << "-- total number of preemptions: " << num_preempts << std::endl;
