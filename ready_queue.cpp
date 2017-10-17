@@ -7,27 +7,26 @@ void ReadyQueue::push(std::vector<Process*> new_processes, const std::string& mo
 	for (unsigned int i = 0; i < new_processes.size(); i++) {
 		new_processes[i]->arrive(clk.time());
 		processes_.push_back(new_processes[i]);
-        clk.PrintTime() ;
-        std::cout << "Process " << new_processes[ i ] -> ID() ;
-        if (mode == "SRT" && current_p &&new_processes[i]->tCPU() < current_p->tCPU()) {
-	        if ( situation == "arrival" ) 
-	            std::cout << " arrived and will preempt " << current_p->ID() << " " ;
-	        else if ( situation == "IO" ) 
-	            std::cout << " completed I/O and will preempt " << current_p->ID() << " " ;
-	        PrintPIDs(new_processes[i]->ID());
-        }
-        else {
-	        if ( situation == "arrival" ) 
-	            std::cout << " arrived and added to ready queue " ;
-	        else if ( situation == "IO" ) 
-	            std::cout << " completed I/O; added to ready queue " ;
-	        PrintPIDs();        	
-        }
-            //std::cout << "Error: Invalid ready_queue push" << std::endl ;
-        
-	}
-	if (new_processes.size())
 		sort(mode);
+        	clk.PrintTime() ;
+        	std::cout << "Process " << new_processes[ i ] -> ID() ;
+        	if (mode == "SRT" && current_p &&new_processes[i]->tCPU() < current_p->tCPU()) {
+	        	if ( situation == "arrival" ) 
+	            		std::cout << " arrived and will preempt " << current_p->ID() << " " ;
+	        	else if ( situation == "IO" ) 
+	            		std::cout << " completed I/O and will preempt " << current_p->ID() << " " ;
+	        	PrintPIDs(new_processes[i]->ID());
+        	}
+        	else {
+	        	if ( situation == "arrival" ) 
+	            		std::cout << " arrived and added to ready queue " ;
+	        	else if ( situation == "IO" ) 
+	            		std::cout << " completed I/O; added to ready queue " ;
+	        	PrintPIDs();        	
+        	}
+	}
+            //std::cout << "Error: Invalid ready_queue push" << std::endl ;
+		
 }
 
 /*
