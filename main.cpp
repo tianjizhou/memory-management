@@ -200,7 +200,10 @@ void print_stat(std::ofstream& out_str, const std::string& mode, int num_bursts,
 	out_str << std::setprecision(2) << std::fixed;
 	out_str << "Algorithm " << mode << std::endl;
 	out_str << "-- average CPU burst time: " << (double)burst_t/num_bursts << " ms" << std::endl;
-	out_str << "-- average wait time: " << (double)wait_time/num_bursts << " ms" << std::endl;
+	if (mode == "SRT")
+		out_str << "-- average wait time: " << (double)(wait_time-half_t_cs*num_preempts)/num_bursts << " ms" << std::endl;
+	else
+		out_str << "-- average wait time: " << (double)wait_time/num_bursts << " ms" << std::endl;
 	out_str << "-- average turnaround time: " << (double)(wait_time+burst_t+half_t_cs*2*num_cs)/num_bursts << " ms" << std::endl;
 	out_str << std::setprecision(0) << std::fixed;
 	out_str << "-- total number of context switches: " << num_cs << std::endl;
