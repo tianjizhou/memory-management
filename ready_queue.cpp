@@ -2,31 +2,33 @@
 #include "ready_queue.h"
 
 // Add new processes into ready queue without sorting
-void ReadyQueue::push(std::vector<Process*> new_processes, const std::string& mode, 
+std::string ReadyQueue::push(std::vector<Process*> new_processes, const std::string& mode, 
                       Clock clk, const std::string& situation, Process* current_p) {
+	std::stringstream output_str;
 	for (unsigned int i = 0; i < new_processes.size(); i++) {
+
 		new_processes[i]->arrive(clk.time());
 		processes_.push_back(new_processes[i]);
 		sort(mode);
-        	clk.PrintTime() ;
-        	std::cout << "Process " << new_processes[ i ] -> ID() ;
+        	clk.PrintTime(output_str) ;
+        	output_str << "Process " << new_processes[ i ] -> ID() ;
         	if (mode == "SRT" && current_p &&new_processes[i]->tCPU() < current_p->tCPU()) {
 	        	if ( situation == "arrival" ) 
-	            		std::cout << " arrived and will preempt " << current_p->ID() << " " ;
+	            		output_str << " arrived and will preempt " << current_p->ID() << " " ;
 	        	else if ( situation == "IO" ) 
-	            		std::cout << " completed I/O and will preempt " << current_p->ID() << " " ;
-	        	PrintPIDs(new_processes[i]->ID());
+	            		output_str << " completed I/O and will preempt " << current_p->ID() << " " ;
+	        	PrintPIDs(new_processes[i]->ID(),output_str);
         	}
         	else {
 	        	if ( situation == "arrival" ) 
-	            		std::cout << " arrived and added to ready queue " ;
+	            		output_str << " arrived and added to ready queue " ;
 	        	else if ( situation == "IO" ) 
-	            		std::cout << " completed I/O; added to ready queue " ;
-	        	PrintPIDs();        	
+	            		output_str << " completed I/O; added to ready queue " ;
+	        	PrintPIDs(output_str);        	
         	}
 	}
             //std::cout << "Error: Invalid ready_queue push" << std::endl ;
-		
+	return output_str.str();
 }
 
 /*
@@ -87,19 +89,30 @@ void ReadyQueue::PrintPIDs() const {
     std::cout << "]" << std::endl ;
 }
 
-void ReadyQueue::PrintPIDs(char id) const {
-    std::cout << "[Q" ;
+void ReadyQueue::PrintPIDs(std::stringstream & output_str) const {
+    output_str << "[Q" ;
+    if( processes_.empty() ) output_str << " <empty>" ;
+    else {
+        std::list<Process*>::const_iterator it ;
+        for ( it = processes_.begin(); it != processes_.end(); ++it )
+            output_str << " " << ( *it ) -> ID() ;
+    }
+    output_str << "]" << std::endl ;
+}
+
+void ReadyQueue::PrintPIDs(char id, std::stringstream & output_str) const {
+    output_str << "[Q" ;
     int count = 0;
     std::list<Process*>::const_iterator it ;
     for ( it = processes_.begin(); it != processes_.end(); ++it ) {
     	if ((*it)->ID() != id) {
-    		std::cout << " " << ( *it ) -> ID();
+    		output_str << " " << ( *it ) -> ID();
     		count++;
     	}        	
     }         	
     if(count == 0)
-    	std::cout << " <empty>" ;    
-    std::cout << "]" << std::endl ;
+    	output_str << " <empty>" ;    
+    output_str << "]" << std::endl ;
 }
 
 void ReadyQueue::tick() {

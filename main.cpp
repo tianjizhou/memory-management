@@ -1,3 +1,13 @@
+// =======================================
+// Team members:
+//
+// Jinghua Feng 	fengj3	
+// Jihui Nie		niej
+// Tianji Zhou		zhout2
+//
+// github link: https://github.com/tianjizhou/operating-system/
+// =======================================
+
 // FILE: main.cpp
 #include <iostream>
 #include <cstdlib>
@@ -66,6 +76,8 @@ int algorithm(std::map<int, std::vector<Process*> > initial_queue,
 	Clock c;
 	IO IOblocker;
 
+	std::string IO_output;	
+
     // Print start of simulation
     c.PrintTime() ;
     std::cout << "Simulator started for "<< mode << " " ;
@@ -83,7 +95,7 @@ int algorithm(std::map<int, std::vector<Process*> > initial_queue,
 		// -------------------------------------------------------
 		if ( pending_queue.find( c.time() ) != pending_queue.end()) {
             // print out new arrvial of processes when pushed in ready_queue
-			ready_queue.push( pending_queue[ c.time() ] , mode, c,
+			std::cout << ready_queue.push( pending_queue[ c.time() ] , mode, c,
 							  "arrival", core.current_process());
 			pending_queue.erase(c.time());
 		}
@@ -108,14 +120,17 @@ int algorithm(std::map<int, std::vector<Process*> > initial_queue,
 			core.push( proc_tmp );
 		}
 		
-	
-
+		
 // =========== TIME: Ns to (N+1)s ===============================================
 
 		// CPU UPDATE --------------------------------------------
 		if (!core.idle() && !core.cs_block()) {	// Not during context switch
 			core.run(c, ready_queue);							// NOTE: If you prefer, we can integrate the conditions into the CPU.run() function.
 		}
+
+		// This is to match the submitty output. Ideally, it should print out immediately after the call of ready_queue.push(IO)
+		// print out IO pop
+		std::cout << IO_output;
 
 		// IO QUEUE UPDATE ---------------------------------------
         // "J"
@@ -148,6 +163,8 @@ int algorithm(std::map<int, std::vector<Process*> > initial_queue,
 		// I/O->ready_queue
 		//
 		// ========================================================
+
+    	
 
 		// CLOCK UPDATE -----------------------------------------
 		// time increases by 1 ms
@@ -192,8 +209,8 @@ int algorithm(std::map<int, std::vector<Process*> > initial_queue,
 
         }
 
-        // Print processes finishing I/O when pushed in ready_queue
-		ready_queue.push( IOblocker.pop(), mode, c,
+    	// pop processes finishing I/O when pushed in ready_queue, print later
+		IO_output = ready_queue.push( IOblocker.pop(), mode, c,
 						  "IO" , core.current_process());
 
 // =========== TIME: ending moment of the Xth second, i.e. start of (N+1)s ======
