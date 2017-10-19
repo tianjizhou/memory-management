@@ -1,3 +1,13 @@
+// =======================================
+// Team members:
+//
+// Jinghua Feng 	fengj3	
+// Jihui Nie		niej
+// Tianji Zhou		zhout2
+//
+// github link: https://github.com/tianjizhou/operating-system/
+// =======================================
+
 // FILE: ready_queue.h
 #ifndef _readyqueue_h
 #define _readyqueue_h
