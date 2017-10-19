@@ -1,3 +1,13 @@
+// =======================================
+// Team members:
+//
+// Jinghua Feng 	fengj3	
+// Jihui Nie		niej
+// Tianji Zhou		zhout2
+//
+// github link: https://github.com/tianjizhou/operating-system/
+// =======================================
+
 // FILE: cpu.cpp
 #include "cpu.h"
 #include <sstream>
