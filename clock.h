@@ -9,6 +9,7 @@ public:
 	void tick() { time_++; }
 
     void PrintTime() { std::cout << "time " << time_ << "ms: " ; }
+    void PrintTime( int t ) { std::cout << "time " << t << "ms: " ; }
 
 private:
 	int time_;

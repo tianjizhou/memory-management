@@ -11,6 +11,7 @@ CPU::CPU() {
 	cs_block_ = false;
 	cs_unblock_ = false;
 	remaining_t_cs_ = 0;
+    process_pushed_ = false ;
 }
 
 Process* CPU::pop(Clock clk , ReadyQueue ready_queue , const std::string& mode) {
@@ -58,10 +59,12 @@ Process* CPU::pop(Clock clk , ReadyQueue ready_queue , const std::string& mode) 
 		else {
 			num_preempts_++;
 			if ( slice_over() && mode == "RR") {
+                //ready_queue.push( process_ , mode , clk.time() ) ;
 				clk.PrintTime();
 				std::cout << "Time slice expired; process " << process_->ID()
 						  << " preempted with " << process_->tCPU() << "ms to go ";
 				ready_queue.PrintPIDs();
+                //process_ -> SetStatus( -1 ) ; // process is in status of c.s.
 			}
 		}
 

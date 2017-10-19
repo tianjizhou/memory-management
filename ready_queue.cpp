@@ -47,10 +47,13 @@ void ReadyQueue::PrintPushProcesses( std::vector<Process*> proc_vec, Clock clk ,
 */
 
 // Process is preempted and added to ready queue
-void ReadyQueue::push(Process* p, const std::string& mode, int t) {
+void ReadyQueue::push(Process* p, const std::string& mode, int t, int half_cs) {
 	if (p != NULL) {
 		p->arrive(t);
 		processes_.push_back(p);
+        if ( mode == "RR" ) {
+            wait_time_ -= half_cs ;
+        }
 		sort(mode);
 	}	
 }

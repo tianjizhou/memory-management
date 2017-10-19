@@ -28,7 +28,7 @@ public:
 	void push(std::vector<Process*> new_processes, const std::string& mode,
 			  Clock clk, const std::string& situation, Process* current_p);
    // void PrintPushProcesses( std::vector<Process*> proc_vec, Clock clk , const std::string & situation ) ;
-	void push(Process* process, const std::string& mode, int t);
+	void push(Process* process, const std::string& mode, int t, int half_cs);
 	Process* pop();
 	void sort(const std::string& mode);
 	void tick();

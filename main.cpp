@@ -95,7 +95,7 @@ int algorithm(std::map<int, std::vector<Process*> > initial_queue,
 			// Preempt process (SRT)
 			if (!core.idle() && mode == "SRT" && !ready_queue.empty()
 				&& ready_queue.front()->tCPU() < core.current_process()->tCPU()) {
-				ready_queue.push(core.pop( c , ready_queue , mode), mode, c.time());
+				ready_queue.push(core.pop( c , ready_queue , mode), mode, c.time(), core.get_half_cs());
 			}
 	
 		}
@@ -118,8 +118,12 @@ int algorithm(std::map<int, std::vector<Process*> > initial_queue,
 		}
 
 		// IO QUEUE UPDATE ---------------------------------------
-		IOblocker.run();						// I/O always ticks, regardless of switching time
+        // "J"
+        // Print processes finishing I/O when pushed in ready_queue
+		//ready_queue.push( IOblocker.pop(), mode, c,
+		//				  "IO" , core.current_process());
 
+		IOblocker.run();						// I/O always ticks, regardless of switching time
 
 		// Print out what was done during this second.
 		/*
@@ -161,9 +165,11 @@ int algorithm(std::map<int, std::vector<Process*> > initial_queue,
 				IOblocker.push(core.pop( c , ready_queue , mode)); // print finish using CPU
 			}
 			// Preempt process (RR)
-			else if (!core.idle() && mode == "RR" && !ready_queue.empty()
+            else if (!core.idle() && mode == "RR" && !ready_queue.empty()
 				&& core.slice_over()) {
-				ready_queue.push(core.pop( c , ready_queue , mode), mode, c.time());
+				//ready_queue.push(core.pop( c , ready_queue , mode), mode, c.time());
+				core.pop( c , ready_queue , mode) ;
+                core.set_process_status( false ) ;
 			}
 			else if (!core.idle() && mode == "RR" && ready_queue.empty()
 				&& core.slice_over()) {
@@ -172,6 +178,19 @@ int algorithm(std::map<int, std::vector<Process*> > initial_queue,
 			// SRT moved to the start of this second, immediately after the arrival of new processes
 	
 		}
+
+        if( core.slice_over() ) {
+			// Preempt process (RR)
+			if ( !core.idle() && mode == "RR" && !ready_queue.empty() 
+                 && !core.single_complete() && !core.process_is_pushed() ) 
+            {
+                //std::cout << "test before push!!" << std::endl ;
+				ready_queue.push( core.current_process(), mode, c.time(), core.get_half_cs() );
+                core.set_process_status( true ) ;
+                //std::cout << "test after push!!" << std::endl ;
+			}
+
+        }
 
         // Print processes finishing I/O when pushed in ready_queue
 		ready_queue.push( IOblocker.pop(), mode, c,

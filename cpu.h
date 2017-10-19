@@ -26,6 +26,7 @@ class CPU {
         int get_half_cs() const { return t_cs_ / 2 ; }
         double num_cs() const { return num_cs_; }
         int num_preempts() const { return num_preempts_; }
+        bool process_is_pushed() const { return process_pushed_ ; }
 
 		// MODIFIER
 		void unload();
@@ -35,6 +36,7 @@ class CPU {
 		void half_cs();
 		void tick();
 		void reset_slice(Clock clk);
+        void set_process_status( bool st ) { process_pushed_ = st ; }
 
 	private:
 
@@ -49,6 +51,7 @@ class CPU {
 		int remaining_t_cs_;
 		bool cs_block_;
 		bool cs_unblock_;
+        bool process_pushed_ ;
 
 		// STAT
 		double num_cs_;	
