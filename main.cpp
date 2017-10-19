@@ -76,7 +76,8 @@ int algorithm(std::map<int, std::vector<Process*> > initial_queue,
 	Clock c;
 	IO IOblocker;
 
-	std::string IO_output;	
+	std::string IO_output;
+	std::string arrival_output;	
 
     // Print start of simulation
     c.PrintTime() ;
@@ -95,11 +96,14 @@ int algorithm(std::map<int, std::vector<Process*> > initial_queue,
 		// -------------------------------------------------------
 		if ( pending_queue.find( c.time() ) != pending_queue.end()) {
             // print out new arrvial of processes when pushed in ready_queue
-			std::cout << ready_queue.push( pending_queue[ c.time() ] , mode, c,
+			arrival_output = ready_queue.push( pending_queue[ c.time() ] , mode, c,
 							  "arrival", core.current_process());
+			//std::cout << arrival_output;
 			pending_queue.erase(c.time());
 		}
-
+		else {
+			arrival_output.clear();
+		}
 		// Preemption --------------------------------------------	
 		// NOTE: Not considering preemtion DURING content switching !!
 		// -------------------------------------------------------
@@ -129,8 +133,9 @@ int algorithm(std::map<int, std::vector<Process*> > initial_queue,
 		}
 
 		// This is to match the submitty output. Ideally, it should print out immediately after the call of ready_queue.push(IO)
-		// print out IO pop
+		// print out IO pop and arrival
 		std::cout << IO_output;
+		std::cout << arrival_output;
 
 		// IO QUEUE UPDATE ---------------------------------------
         // "J"
@@ -212,6 +217,7 @@ int algorithm(std::map<int, std::vector<Process*> > initial_queue,
     	// pop processes finishing I/O when pushed in ready_queue, print later
 		IO_output = ready_queue.push( IOblocker.pop(), mode, c,
 						  "IO" , core.current_process());
+		//std::cout << IO_output;
 
 // =========== TIME: ending moment of the Xth second, i.e. start of (N+1)s ======
 	}
