@@ -132,7 +132,7 @@ int algorithm(std::map<int, std::vector<Process*> > initial_queue,
 			core.run(c, ready_queue);							// NOTE: If you prefer, we can integrate the conditions into the CPU.run() function.
 		}
 
-		// This is to match the submitty output. Ideally, it should print out immediately after the call of ready_queue.push(IO)
+		// This is to match the submitty output. Ideally, it should print out immediately after eacj call of ready_queue.push()
 		// print out IO pop and arrival
 		std::cout << IO_output;
 		std::cout << arrival_output;
