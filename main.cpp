@@ -1,6 +1,52 @@
 // FILE: main.cpp
 
+#include <string>
+#include <set>
+#include <map>
+#include <iostream>
+#include <fstream>
+#include <sstream>
+
+#include "clock.h"
+#include "process.h"
+#include "process_queue.h"
+#include "memory.h"
+
 int main(int argc, char* argv[]) {
-	
-	return EXIT_SUCCESS;
+	if(argc != 2){
+        std::cerr << "USAGE: " << argv[0] << " <input file>" << std::endl;
+		return -1;
+    }
+
+    ProcessQueue aq; // arrival queue
+    Memory mem;
+    Clock c;
+
+    // load input file
+    if (aq.load_file(argv[1]) != 0) {
+    	return -1;
+    }
+    
+    mem.print();
+    while (!aq.empty() || !mem.empty()) {
+    	int arr_time = aq.next_time(); // when next process arrives
+    	int fin_time = mem.next_time(); // when next process finishes
+
+    	while (c.time() != arr_time && c.time() != fin_time) {
+    		c.tick();
+    	}
+
+    	if (c.time() == fin_time) { // remove finished process(es) from memory
+
+    	}
+    	if (c.time() == arr_time) { // allocate memory for arrived process(es)
+    		mem.allocate("first", aq.pop(), c);
+    	}
+    	mem.print();	
+    }
+    return 0;
 }
+
+
+
+
