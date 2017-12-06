@@ -28,7 +28,8 @@ int main(int argc, char* argv[]) {
     }
     
     mem.print();
-    while (!aq.empty() || !mem.empty()) {
+    //while (!aq.empty() || !mem.empty()) {
+    while (!aq.empty()) {
     	int arr_time = aq.next_time(); // when next process arrives
     	int fin_time = mem.next_time(); // when next process finishes
 
@@ -40,7 +41,7 @@ int main(int argc, char* argv[]) {
 
     	}
     	if (c.time() == arr_time) { // allocate memory for arrived process(es)
-    		mem.allocate("first", aq.pop(), c);
+    		mem.allocate("best", aq.pop(), c);
     	}
     	mem.print();	
     }

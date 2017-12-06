@@ -4,7 +4,7 @@
 
 #include <string>
 #include <map>
-#include <set>
+#include <vector>
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -22,11 +22,11 @@ public:
 	// MODIFIERS
 	int load_file(const std::string& filename);
 	void insert(int t, Process p);
-	std::set<Process> pop();	
+	std::vector<Process> pop();	
 	void extend(int t); // extend arrival times due to defragmentation
 
 private:
-	std::map<int, std::set<Process> > processes_;
+	std::map<int, std::vector<Process> > processes_;
 	int next_time_;
 };
 

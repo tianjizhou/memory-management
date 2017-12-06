@@ -29,8 +29,8 @@ private:
 	int index_; // staring point in memory
 };
 
-bool operator< (const Process& left, const Process& right) {
-    return left.ID() < right.ID();
-}
+//bool operator< (const Process& left, const Process& right) {
+//    return left.ID() < right.ID();
+//}
 
 #endif

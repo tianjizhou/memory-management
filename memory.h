@@ -22,7 +22,7 @@ public:
 	bool empty() { return pq_.empty(); }
 
 	// MODIFIERS
-	void allocate(const std::string& mode, std::set<Process> ps, Clock c); 
+	void allocate(const std::string& mode, std::vector<Process> ps, Clock c); 
 	void allocate(const std::string& mode, Process p, Clock c);
 	void pop();
 

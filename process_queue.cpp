@@ -22,7 +22,7 @@ int ProcessQueue::load_file(const std::string& filename) {
     	while (ss >> arr_time) { // read the arrival events in loop
     		ss  >> delimiter >> run_time;
     		Process p(ID, frame, run_time);
-    		processes_[arr_time].insert(p);
+    		processes_[arr_time].push_back(p);
     	}
     }
 
@@ -32,12 +32,12 @@ int ProcessQueue::load_file(const std::string& filename) {
 
 // insert single process
 void ProcessQueue::insert(int t, Process p) {
-    processes_[t].insert(p);
+    processes_[t].push_back(p);
     next_time_ = (processes_.begin())->first;
 }
 
-std::set<Process> ProcessQueue::pop() {
-	std::set<Process> top = (processes_.begin())->second;
+std::vector<Process> ProcessQueue::pop() {
+	std::vector<Process> top = (processes_.begin())->second;
 	processes_.erase(processes_.begin());
     if (processes_.empty())
         next_time_ = -1;
@@ -48,8 +48,8 @@ std::set<Process> ProcessQueue::pop() {
 
 // extend arrival times due to defragmentation
 void ProcessQueue::extend(int t) {
-    std::map<int, std::set<Process> > extended_processes_;
-	std::map<int, std::set<Process> >::iterator itr = processes_.begin();
+    std::map<int, std::vector<Process> > extended_processes_;
+	std::map<int, std::vector<Process> >::iterator itr = processes_.begin();
 	for (; itr != processes_.end(); itr++) {
         extended_processes_[itr->first + t] = itr->second;
 	}

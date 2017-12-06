@@ -35,7 +35,7 @@ int Memory::scan(const std::string& mode, int frame) {
 		if (found != std::string::npos)
 			return (int)found;
 	}
-	else if (mode == " best") {
+	else if (mode == "best") {
 		int best_index = -1;
 		int best_size = total_idle_ + 1;
 		std::size_t tail = 0; // end of last free partition
@@ -85,8 +85,8 @@ void Memory::insert(int index, Process p, int arr_time) {
 }
 
 // memory allocation
-void Memory::allocate(const std::string& mode, std::set<Process> ps, Clock c) {
-	std::set<Process>::iterator itr = ps.begin();
+void Memory::allocate(const std::string& mode, std::vector<Process> ps, Clock c) {
+	std::vector<Process>::iterator itr = ps.begin();
 	for (; itr != ps.end(); itr++) {
 		allocate(mode, *itr, c);
 	}
