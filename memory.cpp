@@ -45,7 +45,7 @@ int Memory::scan(const std::string& mode, int frame) {
 			while (mem_[tail] == '.') {
 				tail++;
 			}
-			if (tail - found < best_size) {
+			if ((int)(tail - found) < best_size) {
 				best_index = found;
 				best_size = tail - found;
 			}

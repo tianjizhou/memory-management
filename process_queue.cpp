@@ -1,10 +1,14 @@
 // FILE: process_queue.cpp
 #include "process_queue.h"
+#include <string.h>
 
 // read from input file
 int ProcessQueue::load_file(const std::string& filename) {
 	// open input file
-	std::ifstream in_str(filename);
+	char* filename_c = new char[filename.length()+1];
+	strcpy(filename_c,filename.c_str());
+	std::ifstream in_str(filename_c);
+	delete[] filename_c;
     if (!in_str) {
         std::cout << "ERROR: failed to open file" << std::endl;
         return -1;
