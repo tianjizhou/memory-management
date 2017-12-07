@@ -77,7 +77,9 @@ void Memory::insert(int index, Process p, int arr_time) {
 	p.set_index(index);
 	pq_.insert(arr_time + p.run_time(), p);
 	for (int i = 0; i < p.frame(); i++) {
-			mem_[(index + i)%num_frames_] = p.ID();
+			mem_[(index + i)%num_frames_] = p.ID(); // Memory is treated as a loop. 
+													// All following functions are implemented based on the same assumption.
+													// If it is wrong, however, only this function needs to be revised.
 
 	}
 	total_idle_ -= p.frame();
@@ -85,7 +87,7 @@ void Memory::insert(int index, Process p, int arr_time) {
 }
 
 // memory allocation
-void Memory::allocate(const std::string& mode, std::vector<Process> ps, Clock c) {
+void Memory::allocate(const std::string& mode, std::vector<Process> ps, Clock & c) {
 	std::vector<Process>::iterator itr = ps.begin();
 	for (; itr != ps.end(); itr++) {
 		allocate(mode, *itr, c);
@@ -95,29 +97,117 @@ void Memory::allocate(const std::string& mode, std::vector<Process> ps, Clock c)
 
 
 // return 0 when succeed; return -1 otherwise (no need to print memory)
-void Memory::allocate(const std::string& mode, Process p, Clock c) {
+void Memory::allocate(const std::string& mode, Process p, Clock & c) {
 	if (mode == "non") { // non-contiguous memory management
-		// hint: use mem_.find('.', position) in loop
+		int required_frame = p.frame();
+		if (total_idle_ < required_frame){ // not enough memory...skip
+			// skip
+			return;
+		}
+		int i;
+		std::vector<int> page_list;
+		while (required_frame>0) {			// allocate frames
+			i=mem_.find('.');
+			mem_[i]=p.ID();
+			page_list.push_back(i);
+			required_frame--;
+		}
+		pq_.insert(c.time() + p.run_time(), p);	// add this process to the quese so that its finishing time is watched
+		total_idle_ -= p.frame();
+		page_table[p.ID()]=page_list;		// add page list of this process to the overall page table
+		
 	}
 	else { // contiguous memory management
 		int index = scan(mode, p.frame());
 		if (index == -2) { // not enough memory...skip
 			// skip
-			
+			return;
 		}
 		if (index == -1) { // degragmentation is required
-			defrag();
+			defrag(c);
 			index = scan(mode, p.frame());
 		}
 		insert(index, p, c.time());
 	}
 }
 
-void Memory::pop() {
-
+void Memory::pop(const std::string& mode) {
+	std::vector<Process> top = pq_.pop();
+	std::vector<Process>::iterator itr = top.begin();
+	for (; itr != top.end(); itr++) {
+		if (mode == "non") {	// non-contiguous
+			std::vector<int>:: iterator it_vec = page_table[itr->ID()].begin();
+			for (;it_vec!=page_table[itr->ID()].end();++it_vec)
+				mem_[*it_vec]='.';			// clean memory
+			page_table.erase(itr->ID());	// delete page list
+		}
+		else {	// contiguous
+			int i=itr->index();
+			for (;i<itr->index()+itr->frame();i++)
+				mem_[i%num_frames_]='.';	// clean memory
+		}
+		total_idle_ += itr->frame();		// increase # of idle frames
+	}
+	
 }
 
-void Memory::defrag() {
+void Memory::defrag(Clock & c) {
+
+	// For output purpose
+	int frame_counter=0; // count the number of frames moved
+	std::vector<char> frags; // store the names of moved processes
+
+	// mark the start of the first hole(a piece of available memory sandwiched between processes)
+	int hole_head=0;
+	for (int i=0;i<num_frames_;i++)
+		if (mem_[i]=='.')
+		{
+			hole_head=i;
+			break;
+		}
+	
+	// mark the next process(fragment) in memory after the first hole
+	int next_frag=-1;
+
+	// iterators to scan through all processes in memory
+	std::map<int, std::vector<Process> > :: iterator it_map;
+	std::vector<Process> :: iterator it_vec;
+
+	while(1)
+	{
+		
+		next_frag=-1; // suppose there's no fragment left
+		for (int i=hole_head;i<num_frames_;i++)
+			if (mem_[i]!='.')
+			{
+				next_frag=i;	// found a fragment
+				break;
+			}
+		if (next_frag==-1) break; // if no fragment left
+
+		// find this process by scanning through all processes
+		for (it_map=pq_.processes_.begin();it_map!=pq_.processes_.end();++it_map)
+			for (it_vec=(it_map->second).begin();it_vec!=(it_map->second).end();++it_vec)
+				if (it_vec->index()==next_frag)
+					break;
+		frame_counter+=it_vec->frame();
+		frags.push_back(it_vec->ID());
+		for (int i=next_frag;i<next_frag+(it_vec->frame());i++)
+			mem_[i]='.';
+		for (int i=hole_head;i<hole_head+(it_vec->frame());i++)
+			mem_[i]=it_vec->ID();
+		it_vec->set_index(hole_head);
+		hole_head+=it_vec->frame();
+		
+	}
+	c.PrintTime();
+	std::cout<<"defragmentaion starts"<<std::endl;
+	c.wait(frame_counter*t_memmove_);
+	c.PrintTime();
+	std::cout<<"defragmentaion completed, moved"<<frame_counter<<" frames, processes:";
+	// use vector<char> frags here to print the processes
+	std::cout<<std::endl;
+	
 
 }
 

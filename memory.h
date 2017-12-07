@@ -22,21 +22,22 @@ public:
 	bool empty() { return pq_.empty(); }
 
 	// MODIFIERS
-	void allocate(const std::string& mode, std::vector<Process> ps, Clock c); 
-	void allocate(const std::string& mode, Process p, Clock c);
-	void pop();
+	void allocate(const std::string& mode, std::vector<Process> ps, Clock & c); 
+	void allocate(const std::string& mode, Process p, Clock & c);
+	void pop(const std::string& mode);
 
 
 private:
 	// helper functions
 	int scan(const std::string& mode, int frame); // contiguous algorithms
-	void defrag();
+	void defrag(Clock & c);
 	void insert(int index, Process p, int arr_time);
 
 
 	// representations
 	std::string mem_;
 	ProcessQueue pq_;
+	std::map<char, std::vector<int> > page_table; 
 
 	int total_idle_;
 	std::size_t next_frame_;

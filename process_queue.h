@@ -28,6 +28,8 @@ public:
 private:
 	std::map<int, std::vector<Process> > processes_;
 	int next_time_;
+
+friend class Memory;
 };
 
 #endif

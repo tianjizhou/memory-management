@@ -4,15 +4,17 @@
 
 class Clock {
 public:
-	Clock() { time_ = 0;}
+	Clock() { time_ = 0;wait_time_=0;}
 	int time() const { return time_; }
 	void tick() { time_++; }
 	void set(int t) {time_ = t; }
+	void wait(int t) {wait_time_+=t;}
 
-    void PrintTime() { std::cout << "time " << time_ << "ms: " ; }
+    void PrintTime() { std::cout << "time " << time_+wait_time_ << "ms: " ; }
 
 private:
 	int time_;
+	int wait_time_;
 };
 
 #endif
