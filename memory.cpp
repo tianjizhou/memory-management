@@ -84,7 +84,7 @@ void Memory::insert(int index, Process p, int arr_time, Output & opt , Clock & c
 
 	}
 	total_idle_ -= p.frame();
-	next_frame_ = index + p.frame();
+	next_frame_ = (index + p.frame())%num_frames_;
 
     opt.PrintPlace( c.rtime() , p.ID() ) ;
     print() ;
@@ -200,12 +200,14 @@ void Memory::defrag( Clock & c , Output & opt ) {
             //opt.PrintDefragBegin( c.rtime(), p.ID() , -1 ) ;
             break; // if no fragment left
         }
-
+		
 		// find this process by scanning through all processes
 		for (it_map=pq_.processes_.begin();it_map!=pq_.processes_.end();++it_map)
 			for (it_vec=(it_map->second).begin();it_vec!=(it_map->second).end();++it_vec)
 				if (it_vec->index()==next_frag)
-					break;
+					goto endloop;	// break out of nested loops
+
+endloop:
 		frame_counter+=it_vec->frame();
 		frags.push_back(it_vec->ID());
 		for (int i=next_frag;i<next_frag+(it_vec->frame());i++)
