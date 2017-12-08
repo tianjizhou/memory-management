@@ -8,6 +8,7 @@
 
 #include "process_queue.h"
 #include "clock.h"
+#include "output.h"
 
 
 class Memory {
@@ -22,16 +23,17 @@ public:
 	bool empty() { return pq_.empty(); }
 
 	// MODIFIERS
-	void allocate(const std::string& mode, std::vector<Process> ps, Clock & c); 
-	void allocate(const std::string& mode, Process p, Clock & c);
-	void pop(const std::string& mode);
+	void allocate(const std::string& mode, std::vector<Process> ps, Clock & c, Output & opt); 
+	void allocate(const std::string& mode, Process p, Clock & c, Output & opt);
+	void pop( const std::string& mode , Output & opt , Clock & c );
 
 
 private:
 	// helper functions
 	int scan(const std::string& mode, int frame); // contiguous algorithms
-	void defrag(Clock & c);
-	void insert(int index, Process p, int arr_time);
+	void defrag( Clock & c , Output & opt );
+	//void insert(int index, Process p, int arr_time);
+	void insert(int index, Process p, int arr_time, Output & opt , Clock & c);
 
 
 	// representations

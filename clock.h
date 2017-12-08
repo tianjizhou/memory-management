@@ -9,12 +9,14 @@ public:
 	void tick() { time_++; }
 	void set(int t) {time_ = t; }
 	void wait(int t) {wait_time_+=t;}
+    int rtime() const { return time_ + wait_time_ ;}
 
     void PrintTime() { std::cout << "time " << time_+wait_time_ << "ms: " ; }
 
 private:
 	int time_;
 	int wait_time_;
+    int real_time_ ;
 };
 
 #endif

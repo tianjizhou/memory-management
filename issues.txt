@@ -1,0 +1,27 @@
+When testing p2-test-input01.txt with "next-fit" mode
+
+1. at 400 ms, for process A, one of the allocated frames is at the end of the memory (should be located at the empty frame between A and B).
+
+2. at 500 ms, Aborted as following shows
+    time 500ms: Process F arrived (requires 24 frames)
+    terminate called after throwing an instance of 'std::out_of_range'
+      what():  basic_string::substr
+    Aborted (core dumped)
+
+
+When testing p2-test-input01.txt with "first-fit" mode
+
+1. at 550 ms, Aborted as following shows
+    time 550ms: Process J arrived (requires 46 frames)
+    time 550ms: Cannot place process J -- starting defragmentation
+    *** Error in `./a.out': double free or corruption (out): 0x00000000015d37b0 ***
+    Aborted (core dumped)
+
+
+p2-test-input01.txt with "best-fit" mode: successful
+
+
+p2-test-input01.txt with "non-contiguous" mode: successful
+
+
+12 PM, Dec 8, 2017, Jinghua

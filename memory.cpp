@@ -73,7 +73,8 @@ int Memory::scan(const std::string& mode, int frame) {
 
 
 // add process starting from the specified index
-void Memory::insert(int index, Process p, int arr_time) {
+void Memory::insert(int index, Process p, int arr_time, Output & opt , Clock & c) {
+    //opt.PrintArrive( arr_time , p.ID() , p.frame() ) ;
 	p.set_index(index);
 	pq_.insert(arr_time + p.run_time(), p);
 	for (int i = 0; i < p.frame(); i++) {
@@ -84,21 +85,25 @@ void Memory::insert(int index, Process p, int arr_time) {
 	}
 	total_idle_ -= p.frame();
 	next_frame_ = index + p.frame();
+
+    opt.PrintPlace( c.rtime() , p.ID() ) ;
+    print() ;
 }
 
 // memory allocation
-void Memory::allocate(const std::string& mode, std::vector<Process> ps, Clock & c) {
+void Memory::allocate(const std::string& mode, std::vector<Process> ps, Clock & c, Output & opt) {
 	std::vector<Process>::iterator itr = ps.begin();
 	for (; itr != ps.end(); itr++) {
-		allocate(mode, *itr, c);
+		allocate(mode, *itr, c, opt );
 	}
 }
 
 
 
 // return 0 when succeed; return -1 otherwise (no need to print memory)
-void Memory::allocate(const std::string& mode, Process p, Clock & c) {
+void Memory::allocate(const std::string& mode, Process p, Clock & c, Output & opt) {
 	if (mode == "non") { // non-contiguous memory management
+        opt.PrintArrive( c.time() , p.ID() , p.frame() ) ;
 		int required_frame = p.frame();
 		if (total_idle_ < required_frame){ // not enough memory...skip
 			// skip
@@ -115,23 +120,30 @@ void Memory::allocate(const std::string& mode, Process p, Clock & c) {
 		pq_.insert(c.time() + p.run_time(), p);	// add this process to the quese so that its finishing time is watched
 		total_idle_ -= p.frame();
 		page_table[p.ID()]=page_list;		// add page list of this process to the overall page table
+        opt.PrintPlace( c.rtime() , p.ID() ) ;
+        print() ; // print memory
+        opt.PrintPageTable( page_table ) ;
 		
 	}
 	else { // contiguous memory management
+        opt.PrintArrive( c.time() , p.ID() , p.frame() ) ;
 		int index = scan(mode, p.frame());
 		if (index == -2) { // not enough memory...skip
 			// skip
+            opt.PrintDefragBegin( c.rtime() , p.ID() , -1 ) ;
 			return;
 		}
 		if (index == -1) { // degragmentation is required
-			defrag(c);
+            opt.PrintDefragBegin( c.rtime() , p.ID() , 1 ) ;
+			defrag( c , opt );
+            print() ;
 			index = scan(mode, p.frame());
 		}
-		insert(index, p, c.time());
+		insert( index, p, c.time(), opt , c );
 	}
 }
 
-void Memory::pop(const std::string& mode) {
+void Memory::pop( const std::string & mode , Output & opt , Clock & c ) {
 	std::vector<Process> top = pq_.pop();
 	std::vector<Process>::iterator itr = top.begin();
 	for (; itr != top.end(); itr++) {
@@ -147,11 +159,12 @@ void Memory::pop(const std::string& mode) {
 				mem_[i%num_frames_]='.';	// clean memory
 		}
 		total_idle_ += itr->frame();		// increase # of idle frames
+        opt.PrintRemove( c.rtime() , itr->ID() ) ;
+        print() ;
 	}
-	
 }
 
-void Memory::defrag(Clock & c) {
+void Memory::defrag( Clock & c , Output & opt ) {
 
 	// For output purpose
 	int frame_counter=0; // count the number of frames moved
@@ -183,7 +196,10 @@ void Memory::defrag(Clock & c) {
 				next_frag=i;	// found a fragment
 				break;
 			}
-		if (next_frag==-1) break; // if no fragment left
+		if (next_frag==-1) { 
+            //opt.PrintDefragBegin( c.rtime(), p.ID() , -1 ) ;
+            break; // if no fragment left
+        }
 
 		// find this process by scanning through all processes
 		for (it_map=pq_.processes_.begin();it_map!=pq_.processes_.end();++it_map)
@@ -200,6 +216,10 @@ void Memory::defrag(Clock & c) {
 		hole_head+=it_vec->frame();
 		
 	}
+
+	c.wait(frame_counter*t_memmove_);
+    opt.PrintDefragEnd( c.rtime() , frags , frame_counter  ) ;
+    /*
 	c.PrintTime();
 	std::cout<<"defragmentaion starts"<<std::endl;
 	c.wait(frame_counter*t_memmove_);
@@ -207,6 +227,7 @@ void Memory::defrag(Clock & c) {
 	std::cout<<"defragmentaion completed, moved"<<frame_counter<<" frames, processes:";
 	// use vector<char> frags here to print the processes
 	std::cout<<std::endl;
+    */
 	
 
 }
