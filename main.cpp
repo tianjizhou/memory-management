@@ -1,3 +1,13 @@
+// =======================================
+// Team members:
+//
+// Jinghua Feng 	fengj3	
+// Jihui Nie		niej
+// Tianji Zhou		zhout2
+//
+// github: https://github.com/tianjizhou/memory-management
+// =======================================
+
 // FILE: main.cpp
 
 #include <string>
@@ -22,8 +32,14 @@ int main(int argc, char* argv[]) {
     }
 
 	algorithm(argv[1],"next");
+    std::cout << std::endl ;
+
 	algorithm(argv[1],"first");
+    std::cout << std::endl ;
+
 	algorithm(argv[1],"best");
+    std::cout << std::endl ;
+
 	algorithm(argv[1],"non");
 
 	return 0;

@@ -1,3 +1,13 @@
+// =======================================
+// Team members:
+//
+// Jinghua Feng 	fengj3	
+// Jihui Nie		niej
+// Tianji Zhou		zhout2
+//
+// github: https://github.com/tianjizhou/memory-management
+// =======================================
+
 // FILE: memory.cpp
 #include "memory.h"
 
@@ -89,7 +99,7 @@ void Memory::allocate(const std::string& mode, std::vector<Process> ps, Clock & 
 // return 0 when succeed; return -1 otherwise (no need to print memory)
 void Memory::allocate(const std::string& mode, Process p, Clock & c, Output & opt) {
 	if (mode == "non") { // non-contiguous memory management
-        opt.PrintArrive( c.time() , p.ID() , p.frame() ) ;
+        opt.PrintArrive( c.rtime() , p.ID() , p.frame() ) ;
 		int required_frame = p.frame();
 		if (total_idle_ < required_frame){ // not enough memory...skip
 			// skip
@@ -115,7 +125,7 @@ void Memory::allocate(const std::string& mode, Process p, Clock & c, Output & op
 		
 	}
 	else { // contiguous memory management
-        opt.PrintArrive( c.time() , p.ID() , p.frame() ) ;
+        opt.PrintArrive( c.rtime() , p.ID() , p.frame() ) ;
 		int index = scan(mode, p.frame());
 		if (index == -2) { // not enough memory...skip
 			// skip

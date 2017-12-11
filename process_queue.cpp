@@ -1,3 +1,13 @@
+// =======================================
+// Team members:
+//
+// Jinghua Feng 	fengj3	
+// Jihui Nie		niej
+// Tianji Zhou		zhout2
+//
+// github: https://github.com/tianjizhou/memory-management
+// =======================================
+
 // FILE: process_queue.cpp
 #include "process_queue.h"
 #include <string.h>

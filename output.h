@@ -1,3 +1,13 @@
+// =======================================
+// Team members:
+//
+// Jinghua Feng 	fengj3	
+// Jihui Nie		niej
+// Tianji Zhou		zhout2
+//
+// github: https://github.com/tianjizhou/memory-management
+// =======================================
+
 // FILE: output.h
 #ifndef OUTPUT_H_
 #define OUTPUT_H_ 
