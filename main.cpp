@@ -45,7 +45,7 @@ int algorithm(const std::string& filename, const std::string& mode)
     opt.PrintStart( mode , c.rtime() ) ;
     //mem.print();
     while (!aq.empty() || !mem.empty()) {
-    //while (!aq.empty()) {
+        
     	int arr_time = aq.next_time(); // when next process arrives
     	int fin_time = mem.next_time(); // when next process finishes
 

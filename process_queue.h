@@ -14,7 +14,7 @@
 class ProcessQueue {
 public:
 	// CONSTRUCTOR
-
+	ProcessQueue() { next_time_ = -1; }
 	// ACCESSORS
 	int next_time() const { return next_time_; }
 	bool empty() const { return processes_.empty(); }

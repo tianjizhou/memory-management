@@ -16,7 +16,7 @@ public:
 private:
 	int time_;
 	int wait_time_;
-    int real_time_ ;
+    //int real_time_ ;
 };
 
 #endif

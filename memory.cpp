@@ -22,13 +22,12 @@ int Memory::scan(const std::string& mode, int frame) {
 	std::string space(frame, '.');
 	std::size_t found;
 	if (mode == "next") {
-		// re-order the map by starting beyond the end of
-		// the most recently placed process
-		std::string reordered_mem = mem_.substr(next_frame_)
-									+ mem_.substr(0, next_frame_);
-		found = reordered_mem.find(space);
+		found = mem_.substr(next_frame_).find(space);
 		if (found != std::string::npos)
-			return (int)(found + next_frame_);		
+			return (int)(found + next_frame_);
+		found = mem_.find(space);
+		if (found != std::string::npos)
+			return (int)found;		
 	}
 	else if (mode == "first") {
 		found = mem_.find(space);
@@ -50,19 +49,6 @@ int Memory::scan(const std::string& mode, int frame) {
 				best_size = tail - found;
 			}
 		}
-		// check the connection of bottom and top of memory
-		int bottom_size = 0;
-		int top_size = 0;
-		while (mem_[num_frames_-1-bottom_size] == '.') {
-			bottom_size++;
-		}
-		while (mem_[top_size] == '.') {
-			top_size++;
-		}
-		int connection_size = bottom_size + top_size;
-		if (bottom_size != 0 && connection_size >= frame
-			&& connection_size < best_size)
-			best_index = num_frames_-bottom_size;
 
 		if (best_index != -1)
 			return best_index;		
