@@ -107,6 +107,9 @@ void Memory::allocate(const std::string& mode, Process p, Clock & c, Output & op
 		int required_frame = p.frame();
 		if (total_idle_ < required_frame){ // not enough memory...skip
 			// skip
+            opt.PrintDefragBegin( c.rtime() , p.ID() , -1 ) ;
+            print() ;
+            opt.PrintPageTable( page_table ) ;
 			return;
 		}
 		int i;
@@ -153,6 +156,7 @@ void Memory::pop( const std::string & mode , Output & opt , Clock & c ) {
 			for (;it_vec!=page_table[itr->ID()].end();++it_vec)
 				mem_[*it_vec]='.';			// clean memory
 			page_table.erase(itr->ID());	// delete page list
+            //opt.PrintPageTable( page_table ) ;
 		}
 		else {	// contiguous
 			int i=itr->index();
@@ -162,6 +166,8 @@ void Memory::pop( const std::string & mode , Output & opt , Clock & c ) {
 		total_idle_ += itr->frame();		// increase # of idle frames
         opt.PrintRemove( c.rtime() , itr->ID() ) ;
         print() ;
+        if ( mode == "non" )
+            opt.PrintPageTable( page_table ) ;
 	}
 }
 

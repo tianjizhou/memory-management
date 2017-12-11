@@ -101,7 +101,7 @@ void Output::PrintPageVector( const std::vector< int > & page_frame ) {
     int i = 0 ;
     for( iter = page_frame.begin() ; iter != page_frame.end() ; iter++ ) {
         //if( ( i + 1 ) % 10 == 0)
-        if( i % 10 == 0)
+        if( i % 10 == 0 && i != 0 )
             std::cout << std::endl ;
         else
             std::cout << " " ;
