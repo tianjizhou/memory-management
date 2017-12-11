@@ -131,6 +131,7 @@ void Memory::allocate(const std::string& mode, Process p, Clock & c, Output & op
 		if (index == -2) { // not enough memory...skip
 			// skip
             opt.PrintDefragBegin( c.rtime() , p.ID() , -1 ) ;
+            print() ;
 			return;
 		}
 		if (index == -1) { // degragmentation is required

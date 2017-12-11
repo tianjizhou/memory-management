@@ -21,9 +21,9 @@ int main(int argc, char* argv[]) {
 		return -1;
     }
 
-	//algorithm(argv[1],"next");
-	//algorithm(argv[1],"first");
-	//algorithm(argv[1],"best");
+	algorithm(argv[1],"next");
+	algorithm(argv[1],"first");
+	algorithm(argv[1],"best");
 	algorithm(argv[1],"non");
 
 	return 0;

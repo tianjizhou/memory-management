@@ -38,7 +38,7 @@ void Output::PrintPlace( const int & t , const char & pid ) {
 
 void Output::PrintRemove( const int & t , const char & pid ) {
 
-    std::cout << "time " << t << "ms: " << "Process " << pid << " removed" << std::endl ;
+    std::cout << "time " << t << "ms: " << "Process " << pid << " removed:" << std::endl ;
 } 
 
 // state = -1, not enough space, skip; state = 1, enough space for defragmentation
@@ -100,7 +100,12 @@ void Output::PrintPageVector( const std::vector< int > & page_frame ) {
     std::vector< int > :: const_iterator iter ;
     int i = 0 ;
     for( iter = page_frame.begin() ; iter != page_frame.end() ; iter++ ) {
-        std::cout << " ["<< i << "," << *iter << "]" ;
+        //if( ( i + 1 ) % 10 == 0)
+        if( i % 10 == 0)
+            std::cout << std::endl ;
+        else
+            std::cout << " " ;
+        std::cout << "["<< i << "," << *iter << "]" ;
         i++ ;
     }
     std::cout << std::endl ;
